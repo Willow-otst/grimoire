@@ -92,8 +92,8 @@
      <property name="title">
       <string>Indent</string>
      </property>
-     <addaction name="action_Indent"/>
-     <addaction name="action_Indent_2"/>
+     <addaction name="action_Increase_Indent"/>
+     <addaction name="action_Decrease_Indent"/>
     </widget>
     <addaction name="menuText"/>
     <addaction name="menuList"/>
@@ -135,7 +135,7 @@
     <string>Strikethrough</string>
    </property>
    <property name="shortcut">
-    <string>Alt+Shift+S</string>
+    <string>Ctrl+5</string>
    </property>
   </action>
   <action name="actionSize">
@@ -167,14 +167,14 @@
     <string>Alt+Shift+-</string>
    </property>
   </action>
-  <action name="action_Indent">
+  <action name="action_Increase_Indent">
    <property name="text">
-    <string>+Indent</string>
+    <string>Increase Indent</string>
    </property>
   </action>
-  <action name="action_Indent_2">
+  <action name="action_Decrease_Indent">
    <property name="text">
-    <string>-Indent</string>
+    <string>Decrease Indent</string>
    </property>
   </action>
   <action name="actionRedo">

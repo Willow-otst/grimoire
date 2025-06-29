@@ -31,8 +31,8 @@ public:
     QAction *actionBullet;
     QAction *actionNumber;
     QAction *actionPlain;
-    QAction *action_Indent;
-    QAction *action_Indent_2;
+    QAction *action_Increase_Indent;
+    QAction *action_Decrease_Indent;
     QAction *actionRedo;
     QAction *actionCut;
     QAction *actionCopy;
@@ -84,10 +84,10 @@ public:
         actionNumber->setObjectName("actionNumber");
         actionPlain = new QAction(MainWindow);
         actionPlain->setObjectName("actionPlain");
-        action_Indent = new QAction(MainWindow);
-        action_Indent->setObjectName("action_Indent");
-        action_Indent_2 = new QAction(MainWindow);
-        action_Indent_2->setObjectName("action_Indent_2");
+        action_Increase_Indent = new QAction(MainWindow);
+        action_Increase_Indent->setObjectName("action_Increase_Indent");
+        action_Decrease_Indent = new QAction(MainWindow);
+        action_Decrease_Indent->setObjectName("action_Decrease_Indent");
         actionRedo = new QAction(MainWindow);
         actionRedo->setObjectName("actionRedo");
         actionCut = new QAction(MainWindow);
@@ -196,8 +196,8 @@ public:
         menuList->addAction(actionBullet);
         menuList->addAction(actionNumber);
         menuList->addAction(actionPlain);
-        menuIndent->addAction(action_Indent);
-        menuIndent->addAction(action_Indent_2);
+        menuIndent->addAction(action_Increase_Indent);
+        menuIndent->addAction(action_Decrease_Indent);
         menuSearch->addAction(actionSearch_File);
         menuSearch->addAction(actionSearch_File_Archive);
         menuSearch->addSeparator();
@@ -222,7 +222,7 @@ public:
 #endif // QT_CONFIG(shortcut)
         actionStrikethrough->setText(QCoreApplication::translate("MainWindow", "Strikethrough", nullptr));
 #if QT_CONFIG(shortcut)
-        actionStrikethrough->setShortcut(QCoreApplication::translate("MainWindow", "Alt+Shift+S", nullptr));
+        actionStrikethrough->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+5", nullptr));
 #endif // QT_CONFIG(shortcut)
         actionSize->setText(QCoreApplication::translate("MainWindow", "Size", nullptr));
         actionBullet->setText(QCoreApplication::translate("MainWindow", "Bullet List", nullptr));
@@ -237,8 +237,8 @@ public:
 #if QT_CONFIG(shortcut)
         actionPlain->setShortcut(QCoreApplication::translate("MainWindow", "Alt+Shift+-", nullptr));
 #endif // QT_CONFIG(shortcut)
-        action_Indent->setText(QCoreApplication::translate("MainWindow", "+Indent", nullptr));
-        action_Indent_2->setText(QCoreApplication::translate("MainWindow", "-Indent", nullptr));
+        action_Increase_Indent->setText(QCoreApplication::translate("MainWindow", "Increase Indent", nullptr));
+        action_Decrease_Indent->setText(QCoreApplication::translate("MainWindow", "Decrease Indent", nullptr));
         actionRedo->setText(QCoreApplication::translate("MainWindow", "Redo", nullptr));
 #if QT_CONFIG(shortcut)
         actionRedo->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+Y, Ctrl+Shift+Z", nullptr));
