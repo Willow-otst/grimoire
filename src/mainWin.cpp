@@ -19,16 +19,20 @@ int EditorWindow::CreateWindow(int argc, char *argv[]) {
     mainWindow_UI->setupUi(&mainWindow);        // Set up the UI in the main window
 
     //Test Text
-    mainWindow_UI->textEdit->setMarkdown("Text");
+    mainWindow_UI->textEdit->setMarkdown("B.I.S. -> **Text** *Text* ~~Text~~ ~~***Text***~~");
 
     // Set font size
     mainWindow_UI->textEdit->selectAll();
     QTextCursor cursor = mainWindow_UI->textEdit->textCursor();
-    QTextCharFormat format = cursor.charFormat();
-    format.setFontPointSize(15);
-    ApplyFormat(cursor, format);
+    QFont font = mainWindow_UI->textEdit->font(); // Get the current font
+    font.setPointSize(15);                        // Set the new point size
+    mainWindow_UI->textEdit->setFont(font);       // Apply the font to the QTextEdit
 
-    // Hook UI action Signals to class functions
+    cursor.movePosition(QTextCursor::Start);
+    mainWindow_UI->textEdit->setTextCursor(cursor);
+
+    // ======= Hook UI action Signals to class functions ============
+    // FORMAT -> TEXT
     QObject::connect(mainWindow_UI->actionBold, &QAction::triggered, [this]() {
         this->Text_Bold();
     });
@@ -42,45 +46,7 @@ int EditorWindow::CreateWindow(int argc, char *argv[]) {
     mainWindow.show();                      // Show the main window
     return app.exec();                      // Start the event loop
 }
-/* TODO: Editor Functions - FILE:
-    SAVE
-    LOAD
-    NEW
 
-    RENAME
-
-    HISTORY
-    DETAILS
-
-    DELETE FILE
-*/
-/* TODO: Editor Functions - EDIT:
-    UNDO
-    REDO
-
-    CUT
-    COPY
-    PASTE
-
-    SELECT ALL
-    DELETE
-
-    FIND
-    FIND AND REPLACE
-*/
-/* TODO: Editor Functions - FORMAT:
-    TEXT:
-        COMPLETE - BOLD
-        COMPLETE - ITALIC
-        COMPLETE - STIKETHROUGH
-    LIST:
-        BULLET LIST
-        NUMBER LIST
-        PLAIN LIST
-    INDENT:
-        INCREASE INDENT
-        DECREASE INDENT
-*/
 // Helper -> applies formatting to selection or cursor position
 void EditorWindow::ApplyFormat(QTextCursor cursor, QTextCharFormat format) {
     if (cursor.hasSelection()) {
@@ -89,6 +55,7 @@ void EditorWindow::ApplyFormat(QTextCursor cursor, QTextCharFormat format) {
         mainWindow_UI->textEdit->setCurrentCharFormat(format);
     }
 }
+// FORMAT -> TEXT Functions
 void EditorWindow::Text_Bold() {
     QTextCursor cursor = mainWindow_UI->textEdit->textCursor();
     QTextCharFormat format = cursor.charFormat();
@@ -106,7 +73,6 @@ void EditorWindow::Text_Italic() {
 
     ApplyFormat(cursor, format);
 }
-
 void EditorWindow::Text_Strikethrough() {
     QTextCursor cursor = mainWindow_UI->textEdit->textCursor();
     QTextCharFormat format = cursor.charFormat();
@@ -115,11 +81,3 @@ void EditorWindow::Text_Strikethrough() {
 
     ApplyFormat(cursor, format);
 }
-
-/* TODO: Editor Functions - SEARCH
-    SEARCH FILE (Same as Find)
-    SEARCH FILE ARCHIVE
-
-    SEARCH GRIMOIRE
-    SEARCH GRIMOIRE ARCHIVE
- */
