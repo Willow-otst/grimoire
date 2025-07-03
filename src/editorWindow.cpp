@@ -1,6 +1,9 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
+#include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Text_Editor.H>
+
 
 #include "editor.h"
 
@@ -51,6 +54,11 @@ EditorWindow::EditorWindow() {
         topBar->add("Search/Grimoire", 0, 0, 0, 0);
         topBar->add("Search/Grimoire Archive", 0, 0, 0, 0);
 
+    Fl_Text_Editor *textBox = new Fl_Text_Editor(0, topBar->h(), mainWindow->w(), mainWindow->h()-30);
+    textBox->buffer(new Fl_Text_Buffer());
+    textBox->wrap_mode(Fl_Text_Editor::WRAP_AT_BOUNDS, 0);
+
+    mainWindow->resizable(textBox);
 }
 
 int EditorWindow::Start(int argc, char **argv) {
