@@ -1,4 +1,4 @@
-#include "editor.h"
+#include "editorWindow.h"
 
 #include <iostream>
 

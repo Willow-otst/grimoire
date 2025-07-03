@@ -5,7 +5,7 @@
 #include <FL/Fl_Text_Editor.H>
 
 
-#include "editor.h"
+#include "editorWindow.h"
 
 #include <iostream>
 
