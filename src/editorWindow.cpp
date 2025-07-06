@@ -1,3 +1,4 @@
+#include <wx/richtext/richtextctrl.h>
 #include <wx/wx.h>
 #include "editorWindow.h"
 #include <iostream>
@@ -73,6 +74,8 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire") {
 
 
     SetMenuBar(menuBar);
+
+    wxRichTextCtrl *richTextCtrl = new wxRichTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE);
 }
 // Deconstructor
 EditorWindow::~EditorWindow() {
