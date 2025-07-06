@@ -1,21 +1,28 @@
+#include <wx/wx.h>
 #include "editorWindow.h"
 #include <iostream>
 
-EditorWindow::EditorWindow() {
+bool GApp::OnInit() {
+    EditorWindow *eWindow = new EditorWindow();  // Create the main frame window
+    eWindow->Show(true);                         // Show the frame
+    return true;
+}
+// Constructor
+EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire") {
 
 }
-
-int EditorWindow::Start(int argc, char **argv) {
+// Deconstructor
+EditorWindow::~EditorWindow() {
 
 }
 
 // FORMAT -> TEXT Functions
-void EditorWindow::Text_Bold(Fl_Widget *, void *) {
+void EditorWindow::Text_Bold(wxCommandEvent &event) {
     std::cout << "B" << std::endl;
 }
-void EditorWindow::Text_Italic(Fl_Widget *, void *) {
+void EditorWindow::Text_Italic(wxCommandEvent &event) {
     std::cout << "I" << std::endl;
 }
-void EditorWindow::Text_Strikethrough(Fl_Widget *, void *) {
+void EditorWindow::Text_Strikethrough(wxCommandEvent &event) {
     std::cout << "S" << std::endl;
 }
