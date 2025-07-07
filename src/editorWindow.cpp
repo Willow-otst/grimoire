@@ -55,7 +55,8 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
         wxMenu *menuText = new wxMenu();
             menuText->Append(FORMAT_TEXT_BOLD,          "Bold\tctrl+b", "");
             Bind(wxEVT_MENU, &EditorWindow::FormatText, this, FORMAT_TEXT_BOLD);
-            menuText->Append(FORMAT_TEXT_ITALIC,        "Italic", "");
+            menuText->Append(FORMAT_TEXT_ITALIC,        "Italic\tctrl+i", "");
+            Bind(wxEVT_MENU, &EditorWindow::FormatText, this, FORMAT_TEXT_ITALIC);
             menuText->Append(FORMAT_TEXT_UNDERLINE,     "Underline", "");
             menuText->Append(FORMAT_TEXT_STIKETHROUGH,  "Strikethrough", "");
         menuFormat->AppendSubMenu(menuText, "Text");
@@ -104,8 +105,10 @@ void EditorWindow::FormatText(wxCommandEvent &event) {
             wxFontWeight newWeight = (textAttr.GetFontWeight() != wxFONTWEIGHT_BOLD) ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL;
             textAttr.SetFontWeight(newWeight);
             break; }
-        case FORMAT_TEXT_ITALIC:
-            break;
+        case FORMAT_TEXT_ITALIC: {
+            wxFontStyle newStyle = (textAttr.GetFontStyle() != wxFONTSTYLE_ITALIC) ? wxFONTSTYLE_ITALIC : wxFONTSTYLE_NORMAL;
+            textAttr.SetFontStyle(newStyle);
+            break; }
         case FORMAT_TEXT_UNDERLINE:
             break;
         case FORMAT_TEXT_STIKETHROUGH:
