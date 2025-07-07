@@ -8,8 +8,11 @@ bool GApp::OnInit() {
     eWindow->Show(true);                         // Show the frame
     return true;
 }
+
+wxRichTextCtrl *richTextBox;
+
 // Constructor
-EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire") {
+EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultPosition, wxSize(500, 500)) {
     wxMenuBar *menuBar = new wxMenuBar;
 
     // File
@@ -47,7 +50,8 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire") {
 
     wxMenu *menuFormat = new wxMenu();
         wxMenu *menuText = new wxMenu();
-            menuText->Append(FORMAT_TEXT_BOLD,          "Bold", "");
+            menuText->Append(FORMAT_TEXT_BOLD,          "Bold\tctrl+b", "");
+            Bind(wxEVT_MENU, &EditorWindow::Text_Bold, this, FORMAT_TEXT_BOLD);
             menuText->Append(FORMAT_TEXT_ITALIC,        "Italic", "");
             menuText->Append(FORMAT_TEXT_UNDERLINE,     "Underline", "");
             menuText->Append(FORMAT_TEXT_STIKETHROUGH,  "Strikethrough", "");
@@ -75,16 +79,29 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire") {
 
     SetMenuBar(menuBar);
 
-    wxRichTextCtrl *richTextCtrl = new wxRichTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE);
+    richTextBox = new wxRichTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE);
 }
 // Deconstructor
 EditorWindow::~EditorWindow() {
-
 }
 
 // FORMAT -> TEXT Functions
 void EditorWindow::Text_Bold(wxCommandEvent &event) {
-    std::cout << "B" << std::endl;
+    long start, end;
+    richTextBox->GetSelection(&start, &end);
+
+    wxTextAttr textAttr;
+    if (start == end) {
+        start = richTextBox->GetInsertionPoint();
+    }
+    richTextBox->GetStyle(start, textAttr);
+
+    wxFontWeight newWeight = (textAttr.GetFontWeight() != wxFONTWEIGHT_BOLD) ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL;
+    textAttr.SetFontWeight(newWeight);
+    if (start != end) {
+        richTextBox->SetStyle(start, end, textAttr);
+    }
+    richTextBox->SetDefaultStyle(textAttr);
 }
 void EditorWindow::Text_Italic(wxCommandEvent &event) {
     std::cout << "I" << std::endl;
