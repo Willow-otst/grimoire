@@ -1,7 +1,10 @@
 #include <wx/richtext/richtextctrl.h>
 #include <wx/wx.h>
+
 #include "editorWindow.h"
+
 #include <iostream>
+#include <format>
 
 bool GApp::OnInit() {
     EditorWindow *eWindow = new EditorWindow();  // Create the main frame window
@@ -51,7 +54,7 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     wxMenu *menuFormat = new wxMenu();
         wxMenu *menuText = new wxMenu();
             menuText->Append(FORMAT_TEXT_BOLD,          "Bold\tctrl+b", "");
-            Bind(wxEVT_MENU, &EditorWindow::Text_Bold, this, FORMAT_TEXT_BOLD);
+            Bind(wxEVT_MENU, &EditorWindow::FormatText, this, FORMAT_TEXT_BOLD);
             menuText->Append(FORMAT_TEXT_ITALIC,        "Italic", "");
             menuText->Append(FORMAT_TEXT_UNDERLINE,     "Underline", "");
             menuText->Append(FORMAT_TEXT_STIKETHROUGH,  "Strikethrough", "");
@@ -86,7 +89,7 @@ EditorWindow::~EditorWindow() {
 }
 
 // FORMAT -> TEXT Functions
-void EditorWindow::Text_Bold(wxCommandEvent &event) {
+void EditorWindow::FormatText(wxCommandEvent &event) {
     long start, end;
     richTextBox->GetSelection(&start, &end);
 
@@ -96,16 +99,24 @@ void EditorWindow::Text_Bold(wxCommandEvent &event) {
     }
     richTextBox->GetStyle(start, textAttr);
 
-    wxFontWeight newWeight = (textAttr.GetFontWeight() != wxFONTWEIGHT_BOLD) ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL;
-    textAttr.SetFontWeight(newWeight);
+    switch (event.GetId()) {
+        case FORMAT_TEXT_BOLD: {
+            wxFontWeight newWeight = (textAttr.GetFontWeight() != wxFONTWEIGHT_BOLD) ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL;
+            textAttr.SetFontWeight(newWeight);
+            break; }
+        case FORMAT_TEXT_ITALIC:
+            break;
+        case FORMAT_TEXT_UNDERLINE:
+            break;
+        case FORMAT_TEXT_STIKETHROUGH:
+            break;
+        default:
+            std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
+            break;
+    }
+
     if (start != end) {
         richTextBox->SetStyle(start, end, textAttr);
     }
     richTextBox->SetDefaultStyle(textAttr);
-}
-void EditorWindow::Text_Italic(wxCommandEvent &event) {
-    std::cout << "I" << std::endl;
-}
-void EditorWindow::Text_Strikethrough(wxCommandEvent &event) {
-    std::cout << "S" << std::endl;
 }

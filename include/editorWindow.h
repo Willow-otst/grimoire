@@ -17,11 +17,9 @@ public:
     void Quit(wxCommandEvent &event);
 
     // Text Menu
-    void Text_Bold(wxCommandEvent &event);
-    void Text_Italic(wxCommandEvent &event);
-    void Text_Strikethrough(wxCommandEvent &event);
-
+    void FormatText(wxCommandEvent &event);
 };
+
 
 //Controll IDs
 enum {
