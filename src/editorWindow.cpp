@@ -57,7 +57,8 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
             Bind(wxEVT_MENU, &EditorWindow::FormatText, this, FORMAT_TEXT_BOLD);
             menuText->Append(FORMAT_TEXT_ITALIC,        "Italic\tctrl+i", "");
             Bind(wxEVT_MENU, &EditorWindow::FormatText, this, FORMAT_TEXT_ITALIC);
-            menuText->Append(FORMAT_TEXT_UNDERLINE,     "Underline", "");
+            menuText->Append(FORMAT_TEXT_UNDERLINE,     "Underline\tctrl+u", "");
+            Bind(wxEVT_MENU, &EditorWindow::FormatText, this, FORMAT_TEXT_UNDERLINE);
             menuText->Append(FORMAT_TEXT_STIKETHROUGH,  "Strikethrough", "");
         menuFormat->AppendSubMenu(menuText, "Text");
 
@@ -109,10 +110,13 @@ void EditorWindow::FormatText(wxCommandEvent &event) {
             wxFontStyle newStyle = (textAttr.GetFontStyle() != wxFONTSTYLE_ITALIC) ? wxFONTSTYLE_ITALIC : wxFONTSTYLE_NORMAL;
             textAttr.SetFontStyle(newStyle);
             break; }
-        case FORMAT_TEXT_UNDERLINE:
-            break;
-        case FORMAT_TEXT_STIKETHROUGH:
-            break;
+        case FORMAT_TEXT_UNDERLINE: {
+            wxTextAttrUnderlineType newUnderline = (textAttr.GetUnderlineType() != wxTEXT_ATTR_UNDERLINE_SOLID) ? wxTEXT_ATTR_UNDERLINE_SOLID : wxTEXT_ATTR_UNDERLINE_NONE;
+            textAttr.SetFontUnderlined(newUnderline);
+            break; }
+        case FORMAT_TEXT_STIKETHROUGH: {
+
+            break; }
         default:
             std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
             break;
