@@ -59,7 +59,8 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
             Bind(wxEVT_MENU, &EditorWindow::FormatText, this, FORMAT_TEXT_ITALIC);
             menuText->Append(FORMAT_TEXT_UNDERLINE,     "Underline\tctrl+u", "");
             Bind(wxEVT_MENU, &EditorWindow::FormatText, this, FORMAT_TEXT_UNDERLINE);
-            menuText->Append(FORMAT_TEXT_STIKETHROUGH,  "Strikethrough", "");
+            menuText->Append(FORMAT_TEXT_STIKETHROUGH,  "Strikethrough\tctrl+alt+5", "");
+            Bind(wxEVT_MENU, &EditorWindow::FormatText, this, FORMAT_TEXT_STIKETHROUGH);
         menuFormat->AppendSubMenu(menuText, "Text");
 
         wxMenu *menuList = new wxMenu();
@@ -85,6 +86,12 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     SetMenuBar(menuBar);
 
     richTextBox = new wxRichTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE);
+    wxTextAttr textAttr;
+    textAttr.SetFontWeight(wxFONTWEIGHT_NORMAL);
+    textAttr.SetFontStyle(wxFONTSTYLE_NORMAL);
+    textAttr.SetFontUnderlined(wxTEXT_ATTR_UNDERLINE_NONE);
+    textAttr.SetBackgroundColour(wxTransparentColour);
+    richTextBox->SetDefaultStyle(textAttr);
 }
 // Deconstructor
 EditorWindow::~EditorWindow() {
@@ -115,7 +122,10 @@ void EditorWindow::FormatText(wxCommandEvent &event) {
             textAttr.SetFontUnderlined(newUnderline);
             break; }
         case FORMAT_TEXT_STIKETHROUGH: {
-
+            // wxWidgets Does not currently support Strikethrough
+            // this currently substitues with font weight
+            wxFontWeight newWeight = (textAttr.GetFontWeight() != wxFONTWEIGHT_THIN) ? wxFONTWEIGHT_THIN : wxFONTWEIGHT_NORMAL;
+            textAttr.SetFontWeight(newWeight);
             break; }
         default:
             std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
