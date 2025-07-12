@@ -2,3 +2,5 @@ build/
 bin/
 *.sh
 TODO.txt
+lib/TOML/
+grimoire.config

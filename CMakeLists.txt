@@ -14,3 +14,5 @@ if(wxWidgets_USE_FILE) # not defined in CONFIG mode
     include(${wxWidgets_USE_FILE})
 endif()
 target_link_libraries(${CMAKE_PROJECT_NAME} ${wxWidgets_LIBRARIES})
+
+include_directories("lib/TOML")
