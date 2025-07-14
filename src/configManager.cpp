@@ -83,7 +83,7 @@ void ConfigMan::LoadConfig() {
     SHORTCUT_LIST_PLAIN =               CheckValue("SHORTCUTS", "LIST_PLAIN",               "");
     SHORTCUT_INCREASE_INDENT =          CheckValue("SHORTCUTS", "INCREASE_INDENT",          "");
     SHORTCUT_DECREASE_INDENT =          CheckValue("SHORTCUTS", "DECREASE_INDENT",          "");
-    SHORTCUT_SEARCH_FILE =              CheckValue("SHORTCUTS", "SEARCH_FILE",              "CTRL+F"); //Redundant
+    SHORTCUT_SEARCH_FILE =              SHORTCUT_FIND; // CheckValue("SHORTCUTS", "SEARCH_FILE",              "CTRL+F"); //Redundant
     SHORTCUT_SEARCH_FILE_ARCHIVE =      CheckValue("SHORTCUTS", "SEARCH_FILE_ARCHIVE",      "");
     SHORTCUT_SEARCH_GRIMOIRE =          CheckValue("SHORTCUTS", "SEARCH_GRIMOIRE",          "");
     SHORTCUT_SEARCH_GRIMOIRE_ARCHIVE =  CheckValue("SHORTCUTS", "SEARCH_GRIMOIRE_ARCHIVE",  "");

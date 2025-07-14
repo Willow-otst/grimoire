@@ -16,8 +16,24 @@ public:
     void About(wxCommandEvent &event);
     void Quit(wxCommandEvent &event);
 
-    // Text Menu
-    void FormatText(wxCommandEvent &event);
+    // EDIT
+    void Edit_Undo(wxCommandEvent &event);
+    void Edit_Redo(wxCommandEvent &event);
+    void Edit_Cut(wxCommandEvent &event);
+    void Edit_Copy(wxCommandEvent &event);
+    void Edit_Paste(wxCommandEvent &event);
+    void Edit_SelectAll(wxCommandEvent &event);
+    void Edit_Delete(wxCommandEvent &event);
+    void Edit_Find(wxCommandEvent &event);
+    void Edit_Replace(wxCommandEvent &event);
+
+
+
+
+
+
+    // FORMAT -> TEXT
+    void Format_Text(wxCommandEvent &event);
 };
 
 
