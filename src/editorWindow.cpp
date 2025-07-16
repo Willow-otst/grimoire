@@ -104,7 +104,9 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     // View
     wxMenu *menuView = new wxMenu();
         menuView->Append(VIEW_ZOOM_IN,      "Zoom In\t" + ConfigMan::SHORTCUT_ZOOM_IN, "");
+        Bind(wxEVT_MENU, &EditorWindow::View_Zoom, this, VIEW_ZOOM_IN);
         menuView->Append(VIEW_ZOOM_OUT,     "Zoom Out\t" + ConfigMan::SHORTCUT_ZOOM_OUT, "");
+        Bind(wxEVT_MENU, &EditorWindow::View_Zoom, this, VIEW_ZOOM_OUT);
     menuBar->Append(menuView, "&View");
     //Format
     wxMenu *menuFormat = new wxMenu();
@@ -134,6 +136,7 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     // Search
     wxMenu *menuSearch = new wxMenu();
         menuSearch->Append(SEARCH_FILE,             "Search File\t" + ConfigMan::SHORTCUT_SEARCH_FILE, "");
+        Bind(wxEVT_MENU, &EditorWindow::Edit_Find, this, SEARCH_FILE);
         menuSearch->Append(SEARCH_FILE_ARCHIVE,     "Search File Archive\t" + ConfigMan::SHORTCUT_SEARCH_FILE_ARCHIVE, "");
         menuSearch->Append(SEARCH_GRIMOIRE,         "Search Grimoire\t" + ConfigMan::SHORTCUT_SEARCH_GRIMOIRE, "");
         menuSearch->Append(SEARCH_GRIMOIRE_ARCHIVE, "Search Grimoire Archive\t" + ConfigMan::SHORTCUT_SEARCH_GRIMOIRE_ARCHIVE, "");
@@ -182,6 +185,45 @@ void EditorWindow::Edit_Find(wxCommandEvent &event) {
 void EditorWindow::Edit_Replace(wxCommandEvent &event) {
     // FIXME
     std::cout << "Tiggered: Replace" << std::endl;
+}
+
+// View
+void EditorWindow::View_Zoom(wxCommandEvent &event) {
+    // FIXME
+    long initial, start, end;
+    initial = richTextBox->GetInsertionPoint();
+    richTextBox->SelectAll();
+    richTextBox->GetSelection(&start, &end);
+
+    wxTextAttr textAttr;
+    if (start == end) {
+        start = richTextBox->GetInsertionPoint();
+    }
+    richTextBox->GetStyle(start, textAttr);
+
+    int newSize = textAttr.GetFontSize();
+    switch (event.GetId()) {
+        case VIEW_ZOOM_IN: {
+            newSize += 1;
+            break;
+        }
+        case VIEW_ZOOM_OUT: {
+            if (newSize == 1) { break; }
+            newSize -= 1;
+            break;
+        }
+        default:
+            std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
+            break;
+    }
+
+    textAttr.SetFontSize(newSize);
+
+    if (start != end) {
+        richTextBox->SetStyle(start, end, textAttr);
+    }
+    richTextBox->SetDefaultStyle(textAttr);
+    richTextBox->SetInsertionPoint(initial);
 }
 
 // FORMAT -> TEXT

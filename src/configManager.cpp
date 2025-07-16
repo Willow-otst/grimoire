@@ -72,8 +72,8 @@ void ConfigMan::LoadConfig() {
     SHORTCUT_DELETE_FILE =              CheckValue("SHORTCUTS", "DELETE",                   "");
     SHORTCUT_FIND =                     CheckValue("SHORTCUTS", "FIND",                     "CTRL+F");
     SHORTCUT_REPLACE =                  CheckValue("SHORTCUTS", "REPLACE",                  "CTRL+R");
-    SHORTCUT_ZOOM_IN =                  CheckValue("SHORTCUTS", "ZOOM_IN",                  "");
-    SHORTCUT_ZOOM_OUT =                 CheckValue("SHORTCUTS", "ZOOM_OUT",                 "");
+    SHORTCUT_ZOOM_IN =                  CheckValue("SHORTCUTS", "ZOOM_IN",                  "CTRL+=");
+    SHORTCUT_ZOOM_OUT =                 CheckValue("SHORTCUTS", "ZOOM_OUT",                 "CTRL+-");
     SHORTCUT_BOLD =                     CheckValue("SHORTCUTS", "BOLD",                     "CTRL+B");
     SHORTCUT_ITALIC =                   CheckValue("SHORTCUTS", "ITALIC",                   "CTRL+I");
     SHORTCUT_UNDERLINE =                CheckValue("SHORTCUTS", "UNDERLINE",                "CTRL+U");

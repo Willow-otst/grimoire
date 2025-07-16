@@ -27,7 +27,8 @@ public:
     void Edit_Find(wxCommandEvent &event);
     void Edit_Replace(wxCommandEvent &event);
 
-
+    // View
+    void View_Zoom(wxCommandEvent &event);
 
 
 
