@@ -27,7 +27,7 @@ public:
     void Edit_Find(wxCommandEvent &event);
     void Edit_Replace(wxCommandEvent &event);
 
-    // View
+    // VIEW
     void View_Zoom(wxCommandEvent &event);
 
 
@@ -35,6 +35,8 @@ public:
 
     // FORMAT -> TEXT
     void Format_Text(wxCommandEvent &event);
+    // FORMAT -> LIST
+    void Format_List(wxCommandEvent &event);
 };
 
 

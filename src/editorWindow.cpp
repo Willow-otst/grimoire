@@ -124,8 +124,11 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
         // List
         wxMenu *menuList = new wxMenu();
             menuList->Append(FORMAT_LIST_BULLET,        "Bullet\t" + ConfigMan::SHORTCUT_LIST_BULLET, "");
+            Bind(wxEVT_MENU, &EditorWindow::Format_List, this, FORMAT_LIST_BULLET);
             menuList->Append(FORMAT_LIST_NUMBER,        "Number\t" + ConfigMan::SHORTCUT_LIST_NUMBER, "");
+            Bind(wxEVT_MENU, &EditorWindow::Format_List, this, FORMAT_LIST_NUMBER);
             menuList->Append(FORMAT_LIST_PLAIN,         "Plain\t" + ConfigMan::SHORTCUT_LIST_PLAIN, "");
+            Bind(wxEVT_MENU, &EditorWindow::Format_List, this, FORMAT_LIST_PLAIN);
         menuFormat->AppendSubMenu(menuList, "List");
         // Indent
         wxMenu *menuIndent = new wxMenu();
@@ -189,7 +192,6 @@ void EditorWindow::Edit_Replace(wxCommandEvent &event) {
 
 // View
 void EditorWindow::View_Zoom(wxCommandEvent &event) {
-    // FIXME
     long initial, start, end;
     initial = richTextBox->GetInsertionPoint();
     richTextBox->SelectAll();
@@ -258,6 +260,40 @@ void EditorWindow::Format_Text(wxCommandEvent &event) {
             break; }
         default:
             std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
+            break;
+    }
+
+    if (start != end) {
+        richTextBox->SetStyle(start, end, textAttr);
+    }
+    richTextBox->SetDefaultStyle(textAttr);
+}
+// FORMAT -> LIST
+void EditorWindow::Format_List(wxCommandEvent &event) {
+    long start, end;
+    richTextBox->GetSelection(&start, &end);
+
+    wxTextAttr textAttr;
+    if (start == end) {
+        start = richTextBox->GetInsertionPoint();
+        end = start + 1;
+    }
+    richTextBox->GetStyle(start, textAttr);
+
+    switch (event.GetId()) {
+        case FORMAT_LIST_BULLET: {
+            wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
+            textAttr.SetBulletStyle(newBulletStyle);
+            textAttr.SetBulletText("   * ");
+            break; }
+        case FORMAT_LIST_NUMBER: {
+            std::cout << "FORMAT-LSIT: Number" << std::endl;
+            break; }
+        case FORMAT_LIST_PLAIN: {
+            std::cout << "FORMAT-LSIT: Plain" << std::endl;
+            break; }
+        default:
+            std::cout << "ERROR - Incorrect ListID passed: " << event.GetId() << std::endl;
             break;
     }
 
