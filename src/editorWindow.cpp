@@ -287,10 +287,12 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
             textAttr.SetBulletText("   * ");
             break; }
         case FORMAT_LIST_NUMBER: {
-            std::cout << "FORMAT-LSIT: Number" << std::endl;
+            std::cout << "FORMAT-LIST: Number" << std::endl;
             break; }
         case FORMAT_LIST_PLAIN: {
-            std::cout << "FORMAT-LSIT: Plain" << std::endl;
+            wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
+            textAttr.SetBulletStyle(newBulletStyle);
+            textAttr.SetBulletText("   - ");
             break; }
         default:
             std::cout << "ERROR - Incorrect ListID passed: " << event.GetId() << std::endl;
