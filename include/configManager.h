@@ -12,13 +12,23 @@ private:
     static toml::table cfgTable;
 
     static void CheckTable(const std::string &name);
-    static std::string CheckValue(const std::string &tableName, const std::string &valueName, const std::string &value);
-
+    static std::string CheckValue(
+        const std::string &tableName,
+        const std::string &valueName,
+        const std::string &value);
+    static int CheckValue(
+        const std::string &tableName,
+        const std::string &valueName,
+        int value);
 public:
     static void LoadConfig();
     static void SaveConfig();
 
+    // CONFIG -> TAB
+    static int TAB_SIZE;
+    static std::string TAB_CHARACTER;
 
+    // CONFIG -> SHORTCUTS
     static std::string SHORTCUT_SAVE;
     static std::string SHORTCUT_LOAD;
     static std::string SHORTCUT_NEW;

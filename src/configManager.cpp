@@ -16,6 +16,11 @@ namespace fs = std::filesystem;
 std::string ConfigMan::cfgPath = "grimoire.config";
 toml::table ConfigMan::cfgTable;
 
+// CONFIG -> TAB
+int ConfigMan::TAB_SIZE;
+std::string ConfigMan::TAB_CHARACTER;
+
+// CONFIG -> SHORTCUTS
 std::string ConfigMan::SHORTCUT_SAVE;
 std::string ConfigMan::SHORTCUT_LOAD;
 std::string ConfigMan::SHORTCUT_NEW;
@@ -54,6 +59,10 @@ void ConfigMan::LoadConfig() {
         file.close();
     }
     cfgTable = toml::parse_file(cfgPath);
+
+    CheckTable("TAB");
+    TAB_SIZE =      CheckValue("TAB", "SIZE", 3);
+    TAB_CHARACTER = CheckValue("TAB", "CHARACTER", " ");
 
     CheckTable("SHORTCUTS");
     SHORTCUT_SAVE =                     CheckValue("SHORTCUTS", "SAVE",                     "CTRL+S");
@@ -110,4 +119,11 @@ std::string ConfigMan::CheckValue(const std::string &tableName, const std::strin
         table->insert_or_assign(valueName, value);
     }
     return table->get(valueName)->value<std::string>().value();
+}
+int ConfigMan::CheckValue(const std::string &tableName, const std::string &valueName, int value) {
+    toml::table* table = cfgTable[tableName].as_table();
+    if (!table->contains(valueName)) {
+        table->insert_or_assign(valueName, value);
+    }
+    return table->get(valueName)->value<int>().value();
 }

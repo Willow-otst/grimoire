@@ -177,7 +177,6 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
         wxCommandEvent IndentEvent(wxEVT_MENU,
                        (event.ShiftDown()) ? FORMAT_INDENT_DECREASE : FORMAT_INDENT_INCREASE);
         ProcessEvent(IndentEvent);
-        std::cout << "INDENT" << std::endl;
         return;
     }
     // Pass on all other Keys
@@ -339,28 +338,32 @@ void EditorWindow::Format_Indent(wxCommandEvent &event) {
     switch (event.GetId()) {
         case FORMAT_INDENT_INCREASE: {
             if (startPos == endPos) {
-                richTextBox->WriteText("   ");
+                for (int i = 0; i < ConfigMan::TAB_SIZE; ++i) {
+                    richTextBox->WriteText(ConfigMan::TAB_CHARACTER);
+                }
                 return;
             }
 
-            startPos += 3; // 3 IS LENGTH IF INDENT
+            startPos += ConfigMan::TAB_SIZE;
             for (long i = startLine; i <= endLine; ++i) {
                 insertPos = richTextBox->XYToPosition(0, i);
                 richTextBox->SetInsertionPoint(insertPos);
-                richTextBox->WriteText("   ");
-                endPos += 3;  // 3 IS LENGTH IF INDENT
+                for (int i = 0; i < ConfigMan::TAB_SIZE; ++i) {
+                    richTextBox->WriteText(ConfigMan::TAB_CHARACTER);
+                }
+                endPos += ConfigMan::TAB_SIZE;
             }
 
             break; }
         case FORMAT_INDENT_DECREASE: {
             if (startPos == endPos) {
-                for (int i = 0; i < 3; ++i) {
+                for (int i = 0; i < ConfigMan::TAB_SIZE; ++i) {
                     insertPos = richTextBox->GetInsertionPoint();
                     if (insertPos == 0) {
                         continue;
                     }
                     richTextBox->SetSelection(insertPos - 1, insertPos);
-                    if (richTextBox->GetStringSelection() != " ") {
+                    if (richTextBox->GetStringSelection() != ConfigMan::TAB_CHARACTER) {
                         continue;
                     }
                     richTextBox->DeleteSelection();
@@ -371,11 +374,11 @@ void EditorWindow::Format_Indent(wxCommandEvent &event) {
 
             for (long i = startLine; i <= endLine; ++i) {
                 insertPos = richTextBox->XYToPosition(0, i);
-                for (int j = 0; j < 3; ++j) {
+                for (int j = 0; j < ConfigMan::TAB_SIZE; ++j) {
                     richTextBox->SetInsertionPoint(insertPos);
                     richTextBox->SetSelection(insertPos, insertPos + 1);
 
-                    if (richTextBox->GetStringSelection() != " ") {
+                    if (richTextBox->GetStringSelection() != ConfigMan::TAB_CHARACTER) {
                         continue;
                     }
 
