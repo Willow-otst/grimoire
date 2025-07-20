@@ -179,6 +179,42 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
         ProcessEvent(IndentEvent);
         return;
     }
+    // Custom ENTER Behaviour
+    if (event.GetKeyCode() == WXK_RETURN) {
+        // Delete Selected Text
+        if (richTextBox->HasSelection()) {
+            richTextBox->DeleteSelection();
+        }
+
+        // Process caret
+        long insertPos, tabLength, line;
+        insertPos = richTextBox->GetInsertionPoint();
+        richTextBox->PositionToXY(insertPos, &tabLength, &line); // tabLength passed but will be discarded
+        tabLength = 0;                                           // set to 0 for later use
+
+        // Check current line's indentation
+        wxString lineText = richTextBox->GetLineText(line);
+        for (wxString::const_iterator i = lineText.begin(); i != lineText.end(); ++i) {
+            char c = *i;
+            if (std::string(1, c) != ConfigMan::TAB_CHARACTER) {
+                break;
+            }
+
+            tabLength++;
+        }
+
+        // process 'return' (newline)
+        richTextBox->WriteText("\n");
+
+        // write indentation from previous line
+        while (tabLength > 0) {
+            richTextBox->WriteText(ConfigMan::TAB_CHARACTER);
+            tabLength--;
+        }
+
+        return;             // exit so we dont replay default Behaviour
+    }
+
     // Pass on all other Keys
     event.Skip();
 }
@@ -205,6 +241,7 @@ void EditorWindow::Edit_Delete(wxCommandEvent &event) {
         end = richTextBox->GetInsertionPoint();
         richTextBox->SetSelection(start, end);
     }
+
     richTextBox->DeleteSelection();
 }
 void EditorWindow::Edit_Find(wxCommandEvent &event) {
