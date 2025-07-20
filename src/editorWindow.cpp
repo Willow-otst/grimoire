@@ -189,7 +189,9 @@ void EditorWindow::Edit_Redo(wxCommandEvent &event)      { richTextBox->Redo(); 
 void EditorWindow::Edit_Cut(wxCommandEvent &event)       { richTextBox->Cut(); }
 void EditorWindow::Edit_Copy(wxCommandEvent &event)      { richTextBox->Copy(); }
 void EditorWindow::Edit_Paste(wxCommandEvent &event)     { richTextBox->Paste(); }
-void EditorWindow::Edit_SelectAll(wxCommandEvent &event) { richTextBox->SelectAll(); }
+void EditorWindow::Edit_SelectAll(wxCommandEvent &event) {
+    richTextBox->SetSelection(0, richTextBox->GetLastPosition());
+}
 void EditorWindow::Edit_Delete(wxCommandEvent &event) {
     long start, end;
     richTextBox->GetSelection(&start, &end);
