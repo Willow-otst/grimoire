@@ -4,6 +4,7 @@
 #include "editorWindow.h"
 #include "configManager.h"
 
+#include <string>
 #include <iostream>
 #include <format>
 
@@ -133,7 +134,9 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
         // Indent
         wxMenu *menuIndent = new wxMenu();
             menuIndent->Append(FORMAT_INDENT_INCREASE,  "Increase\t" + ConfigMan::SHORTCUT_INCREASE_INDENT, "");
+            Bind(wxEVT_MENU, &EditorWindow::Format_Indent, this, FORMAT_INDENT_INCREASE);
             menuIndent->Append(FORMAT_INDENT_DECREASE,  "Decrease\t" + ConfigMan::SHORTCUT_DECREASE_INDENT, "");
+            Bind(wxEVT_MENU, &EditorWindow::Format_Indent, this, FORMAT_INDENT_DECREASE);
         menuFormat->AppendSubMenu(menuIndent, "Indent");
     menuBar->Append(menuFormat, "For&mat");
     // Search
@@ -150,15 +153,35 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
 
     richTextBox = new wxRichTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE);
     // Default Style
+    wxFont courierFont(wxFontInfo(12).FaceName("Courier New").Family(wxFONTFAMILY_MODERN));
+    richTextBox->SetFont(courierFont);
     wxTextAttr textAttr;
     textAttr.SetFontWeight(wxFONTWEIGHT_NORMAL);
     textAttr.SetFontStyle(wxFONTSTYLE_NORMAL);
     textAttr.SetFontUnderlined(wxTEXT_ATTR_UNDERLINE_NONE);
     textAttr.SetBackgroundColour(wxTransparentColour);
     richTextBox->SetDefaultStyle(textAttr);
+
+    // Custom KEY Behaviour
+    richTextBox->Bind(wxEVT_KEY_DOWN, &EditorWindow::KeyDown, this);
+
 }
 // Deconstructor
 EditorWindow::~EditorWindow() {
+}
+
+// Custom Key Behaviour
+void EditorWindow::KeyDown(wxKeyEvent& event) {
+    // Custom TAB Behaviour
+    if (event.GetKeyCode() == WXK_TAB) {
+        wxCommandEvent IndentEvent(wxEVT_MENU,
+                       (event.ShiftDown()) ? FORMAT_INDENT_DECREASE : FORMAT_INDENT_INCREASE);
+        ProcessEvent(IndentEvent);
+        std::cout << "INDENT" << std::endl;
+        return;
+    }
+    // Pass on all other Keys
+    event.Skip();
 }
 
 // EDIT
@@ -284,15 +307,15 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
         case FORMAT_LIST_BULLET: {
             wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
             textAttr.SetBulletStyle(newBulletStyle);
-            textAttr.SetBulletText("   * ");
+            textAttr.SetBulletText("   *");
             break; }
         case FORMAT_LIST_NUMBER: {
-            std::cout << "FORMAT-LIST: Number" << std::endl;
+            // FIXME
             break; }
         case FORMAT_LIST_PLAIN: {
             wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
             textAttr.SetBulletStyle(newBulletStyle);
-            textAttr.SetBulletText("   - ");
+            textAttr.SetBulletText("   -");
             break; }
         default:
             std::cout << "ERROR - Incorrect ListID passed: " << event.GetId() << std::endl;
@@ -303,4 +326,72 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
         richTextBox->SetStyle(start, end, textAttr);
     }
     richTextBox->SetDefaultStyle(textAttr);
+}
+
+// FORMAT -> INDENT
+void EditorWindow::Format_Indent(wxCommandEvent &event) {
+    long startPos, endPos, insertPos, startCol, startLine, endCol, endLine;
+
+    richTextBox->GetSelection(&startPos, &endPos);
+    richTextBox->PositionToXY(startPos, &startCol, &startLine);
+    richTextBox->PositionToXY(endPos, &endCol, &endLine);
+
+    switch (event.GetId()) {
+        case FORMAT_INDENT_INCREASE: {
+            if (startPos == endPos) {
+                richTextBox->WriteText("   ");
+                return;
+            }
+
+            startPos += 3; // 3 IS LENGTH IF INDENT
+            for (long i = startLine; i <= endLine; ++i) {
+                insertPos = richTextBox->XYToPosition(0, i);
+                richTextBox->SetInsertionPoint(insertPos);
+                richTextBox->WriteText("   ");
+                endPos += 3;  // 3 IS LENGTH IF INDENT
+            }
+
+            break; }
+        case FORMAT_INDENT_DECREASE: {
+            if (startPos == endPos) {
+                for (int i = 0; i < 3; ++i) {
+                    insertPos = richTextBox->GetInsertionPoint();
+                    if (insertPos == 0) {
+                        continue;
+                    }
+                    richTextBox->SetSelection(insertPos - 1, insertPos);
+                    if (richTextBox->GetStringSelection() != " ") {
+                        continue;
+                    }
+                    richTextBox->DeleteSelection();
+                }
+                richTextBox->SelectNone();
+                return;
+            }
+
+            for (long i = startLine; i <= endLine; ++i) {
+                insertPos = richTextBox->XYToPosition(0, i);
+                for (int j = 0; j < 3; ++j) {
+                    richTextBox->SetInsertionPoint(insertPos);
+                    richTextBox->SetSelection(insertPos, insertPos + 1);
+
+                    if (richTextBox->GetStringSelection() != " ") {
+                        continue;
+                    }
+
+                    if (i == startLine) {
+                        startPos -= 1;
+                    }
+                    endPos -= 1;
+
+                    richTextBox->DeleteSelection();
+                }
+            }
+            break; }
+        default:
+            std::cout << "ERROR - Incorrect ListID passed: " << event.GetId() << std::endl;
+            break;
+    }
+
+    richTextBox->SetSelection(startPos, endPos);
 }

@@ -16,6 +16,9 @@ public:
     void About(wxCommandEvent &event);
     void Quit(wxCommandEvent &event);
 
+    // Custom Key Behaviour
+    void KeyDown(wxKeyEvent& event);
+
     // EDIT
     void Edit_Undo(wxCommandEvent &event);
     void Edit_Redo(wxCommandEvent &event);
@@ -37,6 +40,9 @@ public:
     void Format_Text(wxCommandEvent &event);
     // FORMAT -> LIST
     void Format_List(wxCommandEvent &event);
+
+    // FORMAT -> INDENT
+    void Format_Indent(wxCommandEvent &event);
 };
 
 
