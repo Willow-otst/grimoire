@@ -196,14 +196,16 @@ void EditorWindow::Edit_Delete(wxCommandEvent &event) {
     long start, end;
     richTextBox->GetSelection(&start, &end);
 
-    wxTextAttr textAttr;
     if (start == end) {
-        start = richTextBox->GetInsertionPoint();
-        end = start;
-        start -= 1;
-    }
+        start = richTextBox->GetInsertionPoint() - 1;
+        if (start == -1) { // if we passed start of buffer (0)
+            return;
+        }
 
-    richTextBox->Delete(wxRichTextRange(start, end));
+        end = richTextBox->GetInsertionPoint();
+        richTextBox->SetSelection(start, end);
+    }
+    richTextBox->DeleteSelection();
 }
 void EditorWindow::Edit_Find(wxCommandEvent &event) {
     // FIXME
