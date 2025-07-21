@@ -28,6 +28,9 @@ public:
     static int TAB_SIZE;
     static std::string TAB_CHARACTER;
 
+    // CONFIG -> LIST
+    static std::string LIST_CHARACTERS;
+
     // CONFIG -> SHORTCUTS
     static std::string SHORTCUT_SAVE;
     static std::string SHORTCUT_LOAD;

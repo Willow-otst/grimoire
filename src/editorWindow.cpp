@@ -179,7 +179,7 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
         ProcessEvent(IndentEvent);
         return;
     }
-    // Custom ENTER Behaviour
+    // Custom ENTER/RETURN Behaviour
     if (event.GetKeyCode() == WXK_RETURN) {
         // Delete Selected Text
         if (richTextBox->HasSelection()) {
@@ -192,10 +192,15 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
         richTextBox->PositionToXY(insertPos, &tabLength, &line); // tabLength passed but will be discarded
         tabLength = 0;                                           // set to 0 for later use
 
-        // Check current line's indentation
+        // Check current line's indentation & properties
         wxString lineText = richTextBox->GetLineText(line);
+        std::string appendProperties = "";
         for (wxString::const_iterator i = lineText.begin(); i != lineText.end(); ++i) {
             char c = *i;
+            if (ConfigMan::LIST_CHARACTERS.find(std::string(1, c)) != std::string::npos) {
+                appendProperties += std::string(1, c);
+                break;
+            }
             if (std::string(1, c) != ConfigMan::TAB_CHARACTER) {
                 break;
             }
@@ -211,6 +216,11 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
             richTextBox->WriteText(ConfigMan::TAB_CHARACTER);
             tabLength--;
         }
+        if (appendProperties != "") {
+            richTextBox->WriteText(appendProperties + " ");
+        }
+
+        richTextBox->ShowPosition(richTextBox->GetLastPosition());
 
         return;             // exit so we dont replay default Behaviour
     }
@@ -333,39 +343,39 @@ void EditorWindow::Format_Text(wxCommandEvent &event) {
 }
 // FORMAT -> LIST
 void EditorWindow::Format_List(wxCommandEvent &event) {
-    long start, end;
-    richTextBox->GetSelection(&start, &end);
-
-    wxTextAttr textAttr;
-    if (start == end) {
-        start = richTextBox->GetInsertionPoint();
-        end = start + 1;
-    }
-    richTextBox->GetStyle(start, textAttr);
+    // long start, end;
+    // richTextBox->GetSelection(&start, &end);
+    //
+    // wxTextAttr textAttr;
+    // if (start == end) {
+    //     start = richTextBox->GetInsertionPoint();
+    //     end = start + 1;
+    // }
+    // richTextBox->GetStyle(start, textAttr);
 
     switch (event.GetId()) {
         case FORMAT_LIST_BULLET: {
-            wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
-            textAttr.SetBulletStyle(newBulletStyle);
-            textAttr.SetBulletText("   *");
+            // wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
+            // textAttr.SetBulletStyle(newBulletStyle);
+            // textAttr.SetBulletText("   *");
             break; }
         case FORMAT_LIST_NUMBER: {
             // FIXME
             break; }
         case FORMAT_LIST_PLAIN: {
-            wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
-            textAttr.SetBulletStyle(newBulletStyle);
-            textAttr.SetBulletText("   -");
+            // wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
+            // textAttr.SetBulletStyle(newBulletStyle);
+            // textAttr.SetBulletText("   -");
             break; }
         default:
             std::cout << "ERROR - Incorrect ListID passed: " << event.GetId() << std::endl;
             break;
     }
 
-    if (start != end) {
-        richTextBox->SetStyle(start, end, textAttr);
-    }
-    richTextBox->SetDefaultStyle(textAttr);
+    // if (start != end) {
+    //     richTextBox->SetStyle(start, end, textAttr);
+    // }
+    // richTextBox->SetDefaultStyle(textAttr);
 }
 
 // FORMAT -> INDENT

@@ -20,6 +20,9 @@ toml::table ConfigMan::cfgTable;
 int ConfigMan::TAB_SIZE;
 std::string ConfigMan::TAB_CHARACTER;
 
+// CONFIG -> LIST
+std::string ConfigMan::LIST_CHARACTERS;
+
 // CONFIG -> SHORTCUTS
 std::string ConfigMan::SHORTCUT_SAVE;
 std::string ConfigMan::SHORTCUT_LOAD;
@@ -63,6 +66,9 @@ void ConfigMan::LoadConfig() {
     CheckTable("TAB");
     TAB_SIZE =      CheckValue("TAB", "SIZE", 3);
     TAB_CHARACTER = CheckValue("TAB", "CHARACTER", " ");
+
+    CheckTable("LIST");
+    LIST_CHARACTERS = CheckValue("TAB", "CHARACTERS", "*->.");
 
     CheckTable("SHORTCUTS");
     SHORTCUT_SAVE =                     CheckValue("SHORTCUTS", "SAVE",                     "CTRL+S");
