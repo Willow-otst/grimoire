@@ -172,14 +172,19 @@ EditorWindow::~EditorWindow() {
 
 // Custom Key Behaviour
 void EditorWindow::KeyDown(wxKeyEvent& event) {
-    // Custom TAB Behaviour
+    // ############################
+    // #   Custom TAB Behaviour   #
+    // ############################
     if (event.GetKeyCode() == WXK_TAB) {
         wxCommandEvent IndentEvent(wxEVT_MENU,
                        (event.ShiftDown()) ? FORMAT_INDENT_DECREASE : FORMAT_INDENT_INCREASE);
         ProcessEvent(IndentEvent);
         return;
     }
-    // Custom ENTER/RETURN Behaviour
+
+    // #####################################
+    // #   Custom ENTER/RETURN Behaviour   #
+    // #####################################
     if (event.GetKeyCode() == WXK_RETURN) {
         // Delete Selected Text
         if (richTextBox->HasSelection()) {
@@ -343,39 +348,76 @@ void EditorWindow::Format_Text(wxCommandEvent &event) {
 }
 // FORMAT -> LIST
 void EditorWindow::Format_List(wxCommandEvent &event) {
-    // long start, end;
-    // richTextBox->GetSelection(&start, &end);
-    //
-    // wxTextAttr textAttr;
-    // if (start == end) {
-    //     start = richTextBox->GetInsertionPoint();
-    //     end = start + 1;
-    // }
-    // richTextBox->GetStyle(start, textAttr);
+    long startPos, endPos, insertPos, startCol, startLine, endCol, endLine;
 
+    richTextBox->GetSelection(&startPos, &endPos);
+    if (startPos == endPos) {
+        startPos = richTextBox->GetInsertionPoint();
+        endPos = startPos;
+    }
+    std::cout << startPos << std::endl;
+
+    richTextBox->PositionToXY(startPos, &startCol, &startLine);
+    richTextBox->PositionToXY(endPos, &endCol, &endLine);
+
+    std::string listCharacter = "";
     switch (event.GetId()) {
         case FORMAT_LIST_BULLET: {
-            // wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
-            // textAttr.SetBulletStyle(newBulletStyle);
-            // textAttr.SetBulletText("   *");
+            listCharacter = ConfigMan::LIST_DEFAULT_BULLET;
             break; }
         case FORMAT_LIST_NUMBER: {
             // FIXME
             break; }
         case FORMAT_LIST_PLAIN: {
-            // wxTextAttrBulletStyle newBulletStyle = (textAttr.GetBulletStyle() != wxTEXT_ATTR_BULLET_STYLE_SYMBOL) ? wxTEXT_ATTR_BULLET_STYLE_SYMBOL : wxTEXT_ATTR_BULLET_STYLE_NONE;
-            // textAttr.SetBulletStyle(newBulletStyle);
-            // textAttr.SetBulletText("   -");
+            listCharacter = ConfigMan::LIST_DEFAULT_PLAIN;
             break; }
         default:
             std::cout << "ERROR - Incorrect ListID passed: " << event.GetId() << std::endl;
             break;
     }
 
-    // if (start != end) {
-    //     richTextBox->SetStyle(start, end, textAttr);
-    // }
-    // richTextBox->SetDefaultStyle(textAttr);
+    for (long i = startLine; i <= endLine; ++i) {
+        //std::cout << i << std::endl;
+        insertPos = richTextBox->XYToPosition(0, i);
+        for (int j = 0; j <= richTextBox->GetLineLength(i); ++j) {
+            richTextBox->SetSelection(insertPos, insertPos + 1);
+            if (richTextBox->GetStringSelection() == ConfigMan::TAB_CHARACTER) {
+                insertPos++;
+                continue;
+            }
+
+            if (richTextBox->GetStringSelection() == listCharacter) {
+                richTextBox->DeleteSelection();
+
+                richTextBox->SetSelection(insertPos, insertPos + 1);
+                if (richTextBox->GetStringSelection() == " ") {
+                    richTextBox->DeleteSelection();
+                }
+
+                if (i == 0) {
+                    startPos -= 2;
+                    if (startPos < 0) { startPos = 0; }
+                }
+                endPos -= 2;
+                break;
+            } else {
+                richTextBox->SelectNone();
+                richTextBox->SetInsertionPoint(insertPos);
+                richTextBox->WriteText(listCharacter + " ");
+                if (i == 0) {
+                    startPos += 2;
+                }
+                endPos += 2;
+                break;
+            }
+            insertPos++;
+        }
+
+    }
+        richTextBox->SetInsertionPoint(startPos);
+        if (startPos != endPos) {
+            richTextBox->SetSelection(startPos, endPos);
+        }
 }
 
 // FORMAT -> INDENT
@@ -435,6 +477,7 @@ void EditorWindow::Format_Indent(wxCommandEvent &event) {
 
                     if (i == startLine) {
                         startPos -= 1;
+                        if (startPos < 0) { startPos = 0; }
                     }
                     endPos -= 1;
 

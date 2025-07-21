@@ -22,6 +22,8 @@ std::string ConfigMan::TAB_CHARACTER;
 
 // CONFIG -> LIST
 std::string ConfigMan::LIST_CHARACTERS;
+std::string ConfigMan::LIST_DEFAULT_BULLET;
+std::string ConfigMan::LIST_DEFAULT_PLAIN;
 
 // CONFIG -> SHORTCUTS
 std::string ConfigMan::SHORTCUT_SAVE;
@@ -68,7 +70,9 @@ void ConfigMan::LoadConfig() {
     TAB_CHARACTER = CheckValue("TAB", "CHARACTER", " ");
 
     CheckTable("LIST");
-    LIST_CHARACTERS = CheckValue("TAB", "CHARACTERS", "*->.");
+    LIST_CHARACTERS =       CheckValue("TAB", "CHARACTERS", "*->.");
+    LIST_DEFAULT_BULLET =   CheckValue("TAB", "DEFAULT BULLET", "*");
+    LIST_DEFAULT_PLAIN =    CheckValue("TAB", "DEFAULT PLAIN", "-");
 
     CheckTable("SHORTCUTS");
     SHORTCUT_SAVE =                     CheckValue("SHORTCUTS", "SAVE",                     "CTRL+S");

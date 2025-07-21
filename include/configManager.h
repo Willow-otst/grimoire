@@ -30,6 +30,8 @@ public:
 
     // CONFIG -> LIST
     static std::string LIST_CHARACTERS;
+    static std::string LIST_DEFAULT_BULLET;
+    static std::string LIST_DEFAULT_PLAIN;
 
     // CONFIG -> SHORTCUTS
     static std::string SHORTCUT_SAVE;
