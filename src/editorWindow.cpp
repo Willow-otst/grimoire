@@ -355,7 +355,6 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
         startPos = richTextBox->GetInsertionPoint();
         endPos = startPos;
     }
-    std::cout << startPos << std::endl;
 
     richTextBox->PositionToXY(startPos, &startCol, &startLine);
     richTextBox->PositionToXY(endPos, &endCol, &endLine);
@@ -379,6 +378,16 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
     for (long i = startLine; i <= endLine; ++i) {
         //std::cout << i << std::endl;
         insertPos = richTextBox->XYToPosition(0, i);
+        if (richTextBox->GetLineLength(i) == 0) {
+            richTextBox->SelectNone();
+            richTextBox->SetInsertionPoint(insertPos);
+            richTextBox->WriteText(listCharacter + " ");
+            if (i == 0) {
+                startPos += 2;
+            }
+            endPos += 2;
+            continue;
+        }
         for (int j = 0; j <= richTextBox->GetLineLength(i); ++j) {
             richTextBox->SetSelection(insertPos, insertPos + 1);
             if (richTextBox->GetStringSelection() == ConfigMan::TAB_CHARACTER) {
