@@ -386,7 +386,7 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
                 continue;
             }
 
-            if (richTextBox->GetStringSelection() == listCharacter) {
+            if (ConfigMan::LIST_CHARACTERS.find(richTextBox->GetStringSelection()) != std::string::npos) {
                 richTextBox->DeleteSelection();
 
                 richTextBox->SetSelection(insertPos, insertPos + 1);

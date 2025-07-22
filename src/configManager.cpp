@@ -70,9 +70,9 @@ void ConfigMan::LoadConfig() {
     TAB_CHARACTER = CheckValue("TAB", "CHARACTER", " ");
 
     CheckTable("LIST");
-    LIST_CHARACTERS =       CheckValue("TAB", "CHARACTERS", "*->.");
-    LIST_DEFAULT_BULLET =   CheckValue("TAB", "DEFAULT BULLET", "*");
-    LIST_DEFAULT_PLAIN =    CheckValue("TAB", "DEFAULT PLAIN", "-");
+    LIST_CHARACTERS =       CheckValue("LIST", "CHARACTERS", "*->.");
+    LIST_DEFAULT_BULLET =   CheckValue("LIST", "DEFAULT BULLET", "*");
+    LIST_DEFAULT_PLAIN =    CheckValue("LIST", "DEFAULT PLAIN", "-");
 
     CheckTable("SHORTCUTS");
     SHORTCUT_SAVE =                     CheckValue("SHORTCUTS", "SAVE",                     "CTRL+S");
