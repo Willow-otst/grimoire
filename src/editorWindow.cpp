@@ -192,25 +192,32 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
         }
 
         // Process caret
-        long insertPos, tabLength, line;
+        long insertPos, tabLength, line, startCol, endCol;
         insertPos = richTextBox->GetInsertionPoint();
-        richTextBox->PositionToXY(insertPos, &tabLength, &line); // tabLength passed but will be discarded
-        tabLength = 0;                                           // set to 0 for later use
+        richTextBox->PositionToXY(insertPos, &startCol, &line);
+        tabLength = 0;  // set to 0 for later use
 
         // Check current line's indentation & properties
         wxString lineText = richTextBox->GetLineText(line);
+        std::string listNumber = "";
         std::string appendProperties = "";
         for (wxString::const_iterator i = lineText.begin(); i != lineText.end(); ++i) {
             char c = *i;
-            if (ConfigMan::LIST_CHARACTERS.find(std::string(1, c)) != std::string::npos) {
-                appendProperties += std::string(1, c);
+            std::string charStr = std::string(1, c);
+            if (ConfigMan::LIST_CHARACTERS.find(charStr) != std::string::npos) {
+                appendProperties += charStr;
                 break;
             }
-            if (std::string(1, c) != ConfigMan::TAB_CHARACTER) {
+            if (std::isdigit(charStr[0])) {
+                listNumber += charStr;
+                continue;
+            }
+            if (charStr != ConfigMan::TAB_CHARACTER) {
                 break;
             }
-
-            tabLength++;
+            if (listNumber == "") {
+                tabLength++;
+            }
         }
 
         // process 'return' (newline)
@@ -220,6 +227,10 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
         while (tabLength > 0) {
             richTextBox->WriteText(ConfigMan::TAB_CHARACTER);
             tabLength--;
+        }
+        if (listNumber != "") {
+            listNumber = std::to_string(std::stoi(listNumber) + 1);
+            appendProperties = appendProperties + listNumber;
         }
         if (appendProperties != "") {
             richTextBox->WriteText(appendProperties + " ");
@@ -359,13 +370,15 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
     richTextBox->PositionToXY(startPos, &startCol, &startLine);
     richTextBox->PositionToXY(endPos, &endCol, &endLine);
 
-    std::string listCharacter = "";
+    std::string listCharacter = "*";
+    int listCharacterInt = std::numeric_limits<int>::min();
     switch (event.GetId()) {
         case FORMAT_LIST_BULLET: {
             listCharacter = ConfigMan::LIST_DEFAULT_BULLET;
             break; }
         case FORMAT_LIST_NUMBER: {
-            // FIXME
+            listCharacterInt = 0;
+            listCharacter = std::to_string(listCharacterInt);
             break; }
         case FORMAT_LIST_PLAIN: {
             listCharacter = ConfigMan::LIST_DEFAULT_PLAIN;
@@ -381,11 +394,17 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
         if (richTextBox->GetLineLength(i) == 0) {
             richTextBox->SelectNone();
             richTextBox->SetInsertionPoint(insertPos);
+
+            if (listCharacterInt != std::numeric_limits<int>::min()) {
+                listCharacterInt += 1;
+                listCharacter = std::to_string(listCharacterInt);
+            }
+
             richTextBox->WriteText(listCharacter + " ");
             if (i == 0) {
-                startPos += 2;
+                startPos += (1 + listCharacter.length());
             }
-            endPos += 2;
+            endPos += (1 + listCharacter.length());
             continue;
         }
         for (int j = 0; j <= richTextBox->GetLineLength(i); ++j) {
@@ -395,38 +414,55 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
                 continue;
             }
 
-            if (ConfigMan::LIST_CHARACTERS.find(richTextBox->GetStringSelection()) != std::string::npos) {
+            if (ConfigMan::LIST_CHARACTERS.find(richTextBox->GetStringSelection()) != std::string::npos ||
+                std::isdigit(richTextBox->GetStringSelection()[0])) {
+
+                if (std::isdigit(richTextBox->GetStringSelection()[0])) {
+                    richTextBox->GetSelection(&startCol, &endCol);
+                    while (std::isdigit(richTextBox->GetStringSelection()[0])) {
+                        endCol += 1;
+                        richTextBox->SetSelection(endCol -1, endCol);
+                    }
+                    richTextBox->SetSelection(startCol, endCol);
+                }
+
+                if (i == 0) {
+                    startPos -= (1 + richTextBox->GetStringSelection().length());
+                    if (startPos < 0) { startPos = 0; }
+                }
+                endPos -= (richTextBox->GetStringSelection().length());
+
                 richTextBox->DeleteSelection();
 
                 richTextBox->SetSelection(insertPos, insertPos + 1);
                 if (richTextBox->GetStringSelection() == " ") {
                     richTextBox->DeleteSelection();
+                    endPos -= 1;
                 }
 
-                if (i == 0) {
-                    startPos -= 2;
-                    if (startPos < 0) { startPos = 0; }
-                }
-                endPos -= 2;
                 break;
             } else {
+                if (listCharacterInt != std::numeric_limits<int>::min()) {
+                    listCharacterInt += 1;
+                    listCharacter = std::to_string(listCharacterInt);
+                }
+
                 richTextBox->SelectNone();
                 richTextBox->SetInsertionPoint(insertPos);
                 richTextBox->WriteText(listCharacter + " ");
                 if (i == 0) {
-                    startPos += 2;
+                    startPos += (1 + listCharacter.length());
                 }
-                endPos += 2;
+                endPos += (1 + listCharacter.length());
                 break;
             }
-            insertPos++;
         }
 
     }
-        richTextBox->SetInsertionPoint(startPos);
-        if (startPos != endPos) {
-            richTextBox->SetSelection(startPos, endPos);
-        }
+    richTextBox->SetInsertionPoint(startPos);
+    if (startPos != endPos) {
+        richTextBox->SetSelection(startPos, endPos);
+    }
 }
 
 // FORMAT -> INDENT
