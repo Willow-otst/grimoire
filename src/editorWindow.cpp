@@ -207,6 +207,8 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
             if (ConfigMan::LIST_CHARACTERS.find(charStr) != std::string::npos) {
                 appendProperties += charStr;
                 break;
+            } else if (!std::isdigit(charStr[0]) && listNumber != "") {
+                break;
             }
             if (std::isdigit(charStr[0])) {
                 listNumber += charStr;
