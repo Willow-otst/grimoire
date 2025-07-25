@@ -362,18 +362,10 @@ void EditorWindow::Format_Text(wxCommandEvent &event) {
 // FORMAT -> LIST
 void EditorWindow::Format_List(wxCommandEvent &event) {
     long startPos, endPos, insertPos, startCol, startLine, endCol, endLine;
-
-    richTextBox->GetSelection(&startPos, &endPos);
-    if (startPos == endPos) {
-        startPos = richTextBox->GetInsertionPoint();
-        endPos = startPos;
-    }
-
-    richTextBox->PositionToXY(startPos, &startCol, &startLine);
-    richTextBox->PositionToXY(endPos, &endCol, &endLine);
-
     std::string listCharacter = "*";
     int listCharacterInt = std::numeric_limits<int>::min();
+    bool hasSelection;
+
     switch (event.GetId()) {
         case FORMAT_LIST_BULLET: {
             listCharacter = ConfigMan::LIST_DEFAULT_BULLET;
@@ -390,80 +382,103 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
             break;
     }
 
-    for (long i = startLine; i <= endLine; ++i) {
-        //std::cout << i << std::endl;
-        insertPos = richTextBox->XYToPosition(0, i);
-        if (richTextBox->GetLineLength(i) == 0) {
-            richTextBox->SelectNone();
-            richTextBox->SetInsertionPoint(insertPos);
+    if (richTextBox->HasSelection()) {
+        richTextBox->GetSelection(&startPos, &endPos);
+        hasSelection = true;
+    } else {
+        startPos = richTextBox->GetInsertionPoint();
+        endPos = startPos;
+        hasSelection = false;
+    }
+    richTextBox->PositionToXY(startPos, &startCol, &startLine);
+    richTextBox->PositionToXY(endPos, &endCol, &endLine);
 
+    for (long line = startLine; line <= endLine; ++line) {
+        insertPos = richTextBox->XYToPosition(0, line);
+        richTextBox->SetInsertionPoint(insertPos);
+
+        if (richTextBox->GetLineLength(line) == 0) {
             if (listCharacterInt != std::numeric_limits<int>::min()) {
                 listCharacterInt += 1;
                 listCharacter = std::to_string(listCharacterInt);
             }
 
             richTextBox->WriteText(listCharacter + " ");
-            if (i == 0) {
-                startPos += (1 + listCharacter.length());
-            }
-            endPos += (1 + listCharacter.length());
+            startPos += 1 + listCharacter.length();
             continue;
         }
-        for (int j = 0; j <= richTextBox->GetLineLength(i); ++j) {
+
+        for (int charIndex = 0; charIndex < richTextBox->GetLineLength(line); ++charIndex) {
             richTextBox->SetSelection(insertPos, insertPos + 1);
-            if (richTextBox->GetStringSelection() == ConfigMan::TAB_CHARACTER) {
+            if(richTextBox->GetStringSelection() == ConfigMan::TAB_CHARACTER) {
                 insertPos++;
                 continue;
             }
 
-            if (ConfigMan::LIST_CHARACTERS.find(richTextBox->GetStringSelection()) != std::string::npos ||
-                std::isdigit(richTextBox->GetStringSelection()[0])) {
+            if (std::isdigit(richTextBox->GetStringSelection()[0])) {
+                richTextBox->GetSelection(&startCol, &endCol);
 
-                if (std::isdigit(richTextBox->GetStringSelection()[0])) {
-                    richTextBox->GetSelection(&startCol, &endCol);
-                    while (std::isdigit(richTextBox->GetStringSelection()[0])) {
-                        endCol += 1;
-                        richTextBox->SetSelection(endCol -1, endCol);
-                    }
+                while (std::isdigit(richTextBox->GetStringSelection()[0])) {
+                    startCol++;
+                    endCol++;
                     richTextBox->SetSelection(startCol, endCol);
                 }
-
-                if (i == 0) {
-                    startPos -= (1 + richTextBox->GetStringSelection().length());
-                    if (startPos < 0) { startPos = 0; }
+                if (richTextBox->GetStringSelection() == " ") {
+                    endCol++;
                 }
-                endPos -= (richTextBox->GetStringSelection().length());
+                richTextBox->SetSelection(insertPos, endCol -1);
 
+                if (hasSelection) {
+                    endPos -= ((endCol - 1) - insertPos);
+                } else {
+                    startPos -= ((endCol - 1) - insertPos);
+                }
+                richTextBox->DeleteSelection();
+                break;
+            } else if (ConfigMan::LIST_CHARACTERS.find(richTextBox->GetStringSelection()) != std::string::npos) {
+                if (hasSelection) {
+                    endPos--;
+                } else {
+                    startPos--;
+                }
                 richTextBox->DeleteSelection();
 
                 richTextBox->SetSelection(insertPos, insertPos + 1);
                 if (richTextBox->GetStringSelection() == " ") {
                     richTextBox->DeleteSelection();
-                    endPos -= 1;
+                    if (hasSelection) {
+                        endPos--;
+                    } else {
+                        startPos--;
+                    }
                 }
-
-                break;
-            } else {
-                if (listCharacterInt != std::numeric_limits<int>::min()) {
-                    listCharacterInt += 1;
-                    listCharacter = std::to_string(listCharacterInt);
-                }
-
-                richTextBox->SelectNone();
-                richTextBox->SetInsertionPoint(insertPos);
-                richTextBox->WriteText(listCharacter + " ");
-                if (i == 0) {
-                    startPos += (1 + listCharacter.length());
-                }
-                endPos += (1 + listCharacter.length());
                 break;
             }
-        }
 
+            if (listCharacterInt != std::numeric_limits<int>::min()) {
+                listCharacterInt += 1;
+                listCharacter = std::to_string(listCharacterInt);
+            }
+
+            richTextBox->SelectNone();
+            richTextBox->SetInsertionPoint(insertPos);
+            richTextBox->WriteText(listCharacter + " ");
+
+            if (hasSelection) {
+                endPos += 1 + listCharacter.length();
+            } else {
+                startPos += 1 + listCharacter.length();
+            }
+            break;
+        }
     }
-    richTextBox->SetInsertionPoint(startPos);
-    if (startPos != endPos) {
+    if (startPos < 0) {
+        startPos = 0;
+    }
+    if (hasSelection) {
         richTextBox->SetSelection(startPos, endPos);
+    } else {
+        richTextBox->SetInsertionPoint(startPos);
     }
 }
 
