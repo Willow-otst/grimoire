@@ -1,8 +1,11 @@
 #include <wx/richtext/richtextctrl.h>
 #include <wx/wx.h>
+#include <wx/fdrepdlg.h>
 
 #include "editorWindow.h"
+#include "findReplace_Window.h"
 #include "configManager.h"
+
 
 #include <string>
 #include <iostream>
@@ -62,7 +65,9 @@ wxBEGIN_EVENT_TABLE(wxRichTextCtrl, wxControl)
     EVT_UPDATE_UI(wxID_RICHTEXT_PROPERTIES3, wxRichTextCtrl::OnUpdateProperties)
 wxEND_EVENT_TABLE()
 
-// Constructor
+// #################
+// #  Constructor  #
+// #################
 EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultPosition, wxSize(500, 500)) {
     wxMenuBar *menuBar = new wxMenuBar;
 
@@ -98,9 +103,9 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
         Bind(wxEVT_MENU, &EditorWindow::Edit_Delete, this, EDIT_DELETE);
         menuEdit->AppendSeparator();
         menuEdit->Append(EDIT_FIND,         "Find\t" + ConfigMan::SHORTCUT_FIND, "");
-        Bind(wxEVT_MENU, &EditorWindow::Edit_Find, this, EDIT_FIND);
+        Bind(wxEVT_MENU, &EditorWindow::Edit_FindReplace, this, EDIT_FIND);
         menuEdit->Append(EDIT_REPLACE,      "Replace\t" + ConfigMan::SHORTCUT_REPLACE, "");
-        Bind(wxEVT_MENU, &EditorWindow::Edit_Replace, this, EDIT_REPLACE);
+        Bind(wxEVT_MENU, &EditorWindow::Edit_FindReplace, this, EDIT_REPLACE);
     menuBar->Append(menuEdit, "&Edit");
     // View
     wxMenu *menuView = new wxMenu();
@@ -142,7 +147,7 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     // Search
     wxMenu *menuSearch = new wxMenu();
         menuSearch->Append(SEARCH_FILE,             "Search File\t" + ConfigMan::SHORTCUT_SEARCH_FILE, "");
-        Bind(wxEVT_MENU, &EditorWindow::Edit_Find, this, SEARCH_FILE);
+        Bind(wxEVT_MENU, &EditorWindow::Edit_FindReplace, this, SEARCH_FILE);
         menuSearch->Append(SEARCH_FILE_ARCHIVE,     "Search File Archive\t" + ConfigMan::SHORTCUT_SEARCH_FILE_ARCHIVE, "");
         menuSearch->Append(SEARCH_GRIMOIRE,         "Search Grimoire\t" + ConfigMan::SHORTCUT_SEARCH_GRIMOIRE, "");
         menuSearch->Append(SEARCH_GRIMOIRE_ARCHIVE, "Search Grimoire Archive\t" + ConfigMan::SHORTCUT_SEARCH_GRIMOIRE_ARCHIVE, "");
@@ -166,7 +171,9 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     richTextBox->Bind(wxEVT_KEY_DOWN, &EditorWindow::KeyDown, this);
 
 }
-// Deconstructor
+// #################
+// # Deconstructor #
+// #################
 EditorWindow::~EditorWindow() {
 }
 
@@ -246,8 +253,9 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
     // Pass on all other Keys
     event.Skip();
 }
-
-// EDIT
+// #################
+// #      EDIT     #
+// #################
 void EditorWindow::Edit_Undo(wxCommandEvent &event)      { richTextBox->Undo(); }
 void EditorWindow::Edit_Redo(wxCommandEvent &event)      { richTextBox->Redo(); }
 void EditorWindow::Edit_Cut(wxCommandEvent &event)       { richTextBox->Cut(); }
@@ -272,16 +280,32 @@ void EditorWindow::Edit_Delete(wxCommandEvent &event) {
 
     richTextBox->DeleteSelection();
 }
-void EditorWindow::Edit_Find(wxCommandEvent &event) {
-    // FIXME
-    std::cout << "Tiggered: Find" << std::endl;
-}
-void EditorWindow::Edit_Replace(wxCommandEvent &event) {
-    // FIXME
-    std::cout << "Tiggered: Replace" << std::endl;
-}
+//FIXME
+void EditorWindow::Edit_FindReplace(wxCommandEvent &event) {
+    switch (event.GetId()) {
+        case EDIT_FIND: // Fallthrough
+        case SEARCH_FILE: {
+            std::cout << "Tiggered: Find" << std::endl;
+            break;
+        }
+        case EDIT_REPLACE: {
+            std::cout << "Tiggered: Replace" << std::endl;
+            break;
+        }
+        default:
+            std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
+            break;
+    }
 
-// View
+
+    FindReplace_Window *frWin = new FindReplace_Window(this, richTextBox);
+    // frWin->SetRichTextBox(richTextBox);
+    //frWin->Show(true);
+
+}
+// #################
+// #     View      #
+// #################
 void EditorWindow::View_Zoom(wxCommandEvent &event) {
     long initial, start, end;
     initial = richTextBox->GetInsertionPoint();
@@ -319,7 +343,9 @@ void EditorWindow::View_Zoom(wxCommandEvent &event) {
     richTextBox->SetInsertionPoint(initial);
 }
 
-// FORMAT -> TEXT
+// ####################
+// #  FORMAT -> TEXT  #
+// ####################
 void EditorWindow::Format_Text(wxCommandEvent &event) {
     long start, end;
     richTextBox->GetSelection(&start, &end);
@@ -359,7 +385,10 @@ void EditorWindow::Format_Text(wxCommandEvent &event) {
     }
     richTextBox->SetDefaultStyle(textAttr);
 }
-// FORMAT -> LIST
+
+// ####################
+// #  FORMAT -> LIST  #
+// ####################
 void EditorWindow::Format_List(wxCommandEvent &event) {
     long startPos, endPos, insertPos, startCol, startLine, endCol, endLine;
     std::string listCharacter = "*";
@@ -464,6 +493,8 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
             richTextBox->SetInsertionPoint(insertPos);
             richTextBox->WriteText(listCharacter + " ");
 
+
+
             if (hasSelection) {
                 endPos += 1 + listCharacter.length();
             } else {
@@ -482,7 +513,9 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
     }
 }
 
-// FORMAT -> INDENT
+// ######################
+// #  FORMAT -> INDENT  #
+// ######################
 void EditorWindow::Format_Indent(wxCommandEvent &event) {
     long startPos, endPos, insertPos, startCol, startLine, endCol, endLine;
 

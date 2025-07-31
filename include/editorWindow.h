@@ -27,14 +27,10 @@ public:
     void Edit_Paste(wxCommandEvent &event);
     void Edit_SelectAll(wxCommandEvent &event);
     void Edit_Delete(wxCommandEvent &event);
-    void Edit_Find(wxCommandEvent &event);
-    void Edit_Replace(wxCommandEvent &event);
+    void Edit_FindReplace(wxCommandEvent &event);
 
     // VIEW
     void View_Zoom(wxCommandEvent &event);
-
-
-
 
     // FORMAT -> TEXT
     void Format_Text(wxCommandEvent &event);
