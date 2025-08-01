@@ -458,6 +458,9 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
                 richTextBox->SetSelection(insertPos, endCol -1);
 
                 if (hasSelection) {
+                    if (line == 0) {
+                        startPos -= ((endCol - 1) - insertPos);
+                    }
                     endPos -= ((endCol - 1) - insertPos);
                 } else {
                     startPos -= ((endCol - 1) - insertPos);
@@ -466,6 +469,9 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
                 break;
             } else if (ConfigMan::LIST_CHARACTERS.find(richTextBox->GetStringSelection()) != std::string::npos) {
                 if (hasSelection) {
+                    if (line == 0) {
+                        startPos--;
+                    }
                     endPos--;
                 } else {
                     startPos--;
@@ -476,6 +482,9 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
                 if (richTextBox->GetStringSelection() == " ") {
                     richTextBox->DeleteSelection();
                     if (hasSelection) {
+                        if (line == 0) {
+                            startPos--;
+                        }
                         endPos--;
                     } else {
                         startPos--;
@@ -496,6 +505,9 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
 
 
             if (hasSelection) {
+                if (line == 0) {
+                    startPos += 1 + listCharacter.length();
+                }
                 endPos += 1 + listCharacter.length();
             } else {
                 startPos += 1 + listCharacter.length();
