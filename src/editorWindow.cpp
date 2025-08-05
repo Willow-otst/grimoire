@@ -398,6 +398,11 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
             richTextBox->SetSelection(insertPos, insertPos + 1);
             if(richTextBox->GetStringSelection() == ConfigMan::TAB_CHARACTER) {
                 insertPos++;
+
+                // end of line and no insertion made -> ie after several tab characters
+                if (charIndex + 1 == richTextBox->GetLineLength(line)) {
+                    goto FORCE_INSERT; // Jumps to force an insertion
+                }
                 continue;
             }
 
@@ -454,6 +459,8 @@ void EditorWindow::Format_List(wxCommandEvent &event) {
                 listCharacterInt += 1;
                 listCharacter = std::to_string(listCharacterInt);
             }
+
+            FORCE_INSERT: // Jump-Flag Used to force insertions
 
             richTextBox->SelectNone();
             richTextBox->SetInsertionPoint(insertPos);
