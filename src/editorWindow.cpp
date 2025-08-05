@@ -6,7 +6,6 @@
 #include "findReplace_Window.h"
 #include "configManager.h"
 
-
 #include <string>
 #include <iostream>
 #include <format>
@@ -21,49 +20,6 @@ bool GApp::OnInit() {
 }
 
 wxRichTextCtrl *richTextBox;
-
-// Change Default wxRichTextCtrl Behaviour to use user defined Shortcuts
-wxBEGIN_EVENT_TABLE(wxRichTextCtrl, wxControl)
-    EVT_PAINT(wxRichTextCtrl::OnPaint)
-    EVT_ERASE_BACKGROUND(wxRichTextCtrl::OnEraseBackground)
-    EVT_IDLE(wxRichTextCtrl::OnIdle)
-    EVT_SCROLLWIN(wxRichTextCtrl::OnScroll)
-    EVT_LEFT_DOWN(wxRichTextCtrl::OnLeftClick)
-    EVT_MOTION(wxRichTextCtrl::OnMoveMouse)
-    EVT_LEFT_UP(wxRichTextCtrl::OnLeftUp)
-    EVT_RIGHT_DOWN(wxRichTextCtrl::OnRightClick)
-    EVT_MIDDLE_DOWN(wxRichTextCtrl::OnMiddleClick)
-    EVT_LEFT_DCLICK(wxRichTextCtrl::OnLeftDClick)
-    EVT_CHAR(wxRichTextCtrl::OnChar)
-    EVT_KEY_DOWN(wxRichTextCtrl::OnChar)
-    EVT_SIZE(wxRichTextCtrl::OnSize)
-    EVT_SET_FOCUS(wxRichTextCtrl::OnSetFocus)
-    EVT_KILL_FOCUS(wxRichTextCtrl::OnKillFocus)
-    EVT_MOUSE_CAPTURE_LOST(wxRichTextCtrl::OnCaptureLost)
-    EVT_CONTEXT_MENU(wxRichTextCtrl::OnContextMenu)
-    EVT_SYS_COLOUR_CHANGED(wxRichTextCtrl::OnSysColourChanged)
-    EVT_TIMER(wxID_ANY, wxRichTextCtrl::OnTimer)
-    //EVT_MENU(wxID_UNDO, wxRichTextCtrl::OnUndo)
-    //EVT_UPDATE_UI(wxID_UNDO, wxRichTextCtrl::OnUpdateUndo)
-    //EVT_MENU(wxID_REDO, wxRichTextCtrl::OnRedo)
-    //EVT_UPDATE_UI(wxID_REDO, wxRichTextCtrl::OnUpdateRedo)
-    //EVT_MENU(wxID_COPY, wxRichTextCtrl::OnCopy)
-    //EVT_UPDATE_UI(wxID_COPY, wxRichTextCtrl::OnUpdateCopy)
-    //EVT_MENU(wxID_PASTE, wxRichTextCtrl::OnPaste)
-    //EVT_UPDATE_UI(wxID_PASTE, wxRichTextCtrl::OnUpdatePaste)
-    //EVT_MENU(wxID_CUT, wxRichTextCtrl::OnCut)
-    //EVT_UPDATE_UI(wxID_CUT, wxRichTextCtrl::OnUpdateCut)
-    //EVT_MENU(wxID_CLEAR, wxRichTextCtrl::OnClear)
-    //EVT_UPDATE_UI(wxID_CLEAR, wxRichTextCtrl::OnUpdateClear)
-    //EVT_MENU(wxID_SELECTALL, wxRichTextCtrl::OnSelectAll)
-    //EVT_UPDATE_UI(wxID_SELECTALL, wxRichTextCtrl::OnUpdateSelectAll)
-    EVT_MENU(wxID_RICHTEXT_PROPERTIES1, wxRichTextCtrl::OnProperties)
-    EVT_UPDATE_UI(wxID_RICHTEXT_PROPERTIES1, wxRichTextCtrl::OnUpdateProperties)
-    EVT_MENU(wxID_RICHTEXT_PROPERTIES2, wxRichTextCtrl::OnProperties)
-    EVT_UPDATE_UI(wxID_RICHTEXT_PROPERTIES2, wxRichTextCtrl::OnUpdateProperties)
-    EVT_MENU(wxID_RICHTEXT_PROPERTIES3, wxRichTextCtrl::OnProperties)
-    EVT_UPDATE_UI(wxID_RICHTEXT_PROPERTIES3, wxRichTextCtrl::OnUpdateProperties)
-wxEND_EVENT_TABLE()
 
 // #################
 // #  Constructor  #
@@ -167,8 +123,9 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     textAttr.SetBackgroundColour(wxTransparentColour);
     richTextBox->SetDefaultStyle(textAttr);
 
-    // Custom KEY Behaviour
+    // richTextCtrl Custom KEY/Shortcut Behaviour
     richTextBox->Bind(wxEVT_KEY_DOWN, &EditorWindow::KeyDown, this);
+    richTextBox->SetAcceleratorTable(wxNullAcceleratorTable);
 
 }
 // #################
