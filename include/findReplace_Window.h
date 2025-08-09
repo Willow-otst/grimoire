@@ -9,12 +9,17 @@ class FindReplace_Window : public wxDialog {
 private:
     wxRichTextCtrl* richTextBox;
 
-    wxButton* okButton;  // A pointer to the OK button
+    wxCheckBox* CHBX_MatchCase;
+    wxCheckBox* CHBX_AllowNullReplace;
+
+    wxTextCtrl* TBX_FindInput;
+    wxTextCtrl* TBX_ReplaceInput;
+
 public:
     FindReplace_Window(wxWindow* parent, wxRichTextCtrl* richTextPointer);
     ~FindReplace_Window();
 
-    void OnOkButtonClicked(wxCommandEvent& event);
+    void FindText(wxCommandEvent& event);
 };
 
 enum {
