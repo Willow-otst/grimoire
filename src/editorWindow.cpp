@@ -276,6 +276,8 @@ void EditorWindow::View_Zoom(wxCommandEvent &event) {
     richTextBox->GetStyle(start, textAttr);
 
     int newSize = textAttr.GetFontSize();
+    wxTextAttr textAttr2;
+    textAttr = textAttr2; // Empties the Syle so we dont overrite existing attribues, only size
     switch (event.GetId()) {
         case VIEW_ZOOM_IN: {
             newSize += 1;
