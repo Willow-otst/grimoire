@@ -19,7 +19,9 @@ public:
     FindReplace_Window(wxWindow* parent, wxRichTextCtrl* richTextPointer);
     ~FindReplace_Window();
 
-    void FindText(wxCommandEvent& event);
+    void FindText_Helper(wxCommandEvent& event);
+    bool FindText(wxCommandEvent& event);
+    void ReplaceText(wxCommandEvent& event);
 };
 
 enum {
