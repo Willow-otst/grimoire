@@ -32,11 +32,13 @@ public:
     // VIEW
     void View_Zoom(wxCommandEvent &event);
 
+    // INSERT
+    void Insert_Heading(wxCommandEvent &event);
+
     // FORMAT -> TEXT
     void Format_Text(wxCommandEvent &event);
     // FORMAT -> LIST
     void Format_List(wxCommandEvent &event);
-
     // FORMAT -> INDENT
     void Format_Indent(wxCommandEvent &event);
 };
@@ -69,6 +71,14 @@ enum {
     // View
     VIEW_ZOOM_IN,
     VIEW_ZOOM_OUT,
+
+    //Insert
+    INSERT_HEADING_1,
+    INSERT_HEADING_2,
+    INSERT_HEADING_3,
+    INSERT_HEADING_4,
+    INSERT_HEADING_5,
+    INSERT_HEADING_6,
 
     //Format
     FORMAT_TEXT_BOLD,

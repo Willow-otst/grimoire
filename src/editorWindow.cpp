@@ -70,6 +70,23 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
         menuView->Append(VIEW_ZOOM_OUT,     "Zoom Out\t" + ConfigMan::SHORTCUT_ZOOM_OUT, "");
         Bind(wxEVT_MENU, &EditorWindow::View_Zoom, this, VIEW_ZOOM_OUT);
     menuBar->Append(menuView, "&View");
+    // insert
+    wxMenu *menuInsert = new wxMenu();
+        wxMenu *menuHeader = new wxMenu();
+            menuHeader->Append(INSERT_HEADING_1,    "Header #\t" + ConfigMan::SHORTCUT_HEADER_1, "");
+            Bind(wxEVT_MENU, &EditorWindow::Insert_Heading, this, INSERT_HEADING_1);
+            menuHeader->Append(INSERT_HEADING_2,    "Header #\t" + ConfigMan::SHORTCUT_HEADER_2, "");
+            Bind(wxEVT_MENU, &EditorWindow::Insert_Heading, this, INSERT_HEADING_2);
+            menuHeader->Append(INSERT_HEADING_3,    "Header #\t" + ConfigMan::SHORTCUT_HEADER_3, "");
+            Bind(wxEVT_MENU, &EditorWindow::Insert_Heading, this, INSERT_HEADING_3);
+            menuHeader->Append(INSERT_HEADING_4,    "Header #\t" + ConfigMan::SHORTCUT_HEADER_4, "");
+            Bind(wxEVT_MENU, &EditorWindow::Insert_Heading, this, INSERT_HEADING_4);
+            menuHeader->Append(INSERT_HEADING_5,    "Header #\t" + ConfigMan::SHORTCUT_HEADER_5, "");
+            Bind(wxEVT_MENU, &EditorWindow::Insert_Heading, this, INSERT_HEADING_5);
+            menuHeader->Append(INSERT_HEADING_6,    "Header #\t" + ConfigMan::SHORTCUT_HEADER_6, "");
+            Bind(wxEVT_MENU, &EditorWindow::Insert_Heading, this, INSERT_HEADING_6);
+        menuInsert->AppendSubMenu(menuHeader, "Header");
+    menuBar->Append(menuInsert, "&Insert");
     //Format
     wxMenu *menuFormat = new wxMenu();
         // Text
@@ -237,6 +254,7 @@ void EditorWindow::Edit_Delete(wxCommandEvent &event) {
 
     richTextBox->DeleteSelection();
 }
+
 long frWinID = 0;
 void EditorWindow::Edit_FindReplace(wxCommandEvent &event) {
     FindReplace_Window* frWin = nullptr;
@@ -284,7 +302,7 @@ void EditorWindow::View_Zoom(wxCommandEvent &event) {
 
     int newSize = textAttr.GetFontSize();
     wxTextAttr textAttr2;
-    textAttr = textAttr2; // Empties the Syle so we dont overrite existing attribues, only size
+    textAttr = textAttr2; // Empties the Syle so we dont overwrite existing attribues, only size
     switch (event.GetId()) {
         case VIEW_ZOOM_IN: {
             newSize += 1;
@@ -307,6 +325,68 @@ void EditorWindow::View_Zoom(wxCommandEvent &event) {
     }
     richTextBox->SetDefaultStyle(textAttr);
     richTextBox->SetInsertionPoint(initial);
+}
+// ################
+// #    Insert    #
+// ################
+void EditorWindow::Insert_Heading(wxCommandEvent &event) {
+    // FIXME
+    long start, end;
+    richTextBox->GetSelection(&start, &end);
+
+    wxTextAttr textAttr;
+    if (start == end) {
+        start = richTextBox->GetInsertionPoint();
+    }
+    richTextBox->GetStyle(start, textAttr);
+
+    int newSize = textAttr.GetFontSize();
+
+    //richTextBox->SelectAll();
+    //richTextBox->SetInsertionPoint(initial);
+
+    switch (event.GetId()) {
+        case INSERT_HEADING_1: {
+            std::cout << "Heading 1" << std::endl;
+            newSize = 12 * 3;
+            break;
+        }
+        case INSERT_HEADING_2: {
+            std::cout << "Heading 2" << std::endl;
+            newSize = 12 * 2.5;
+            break;
+        }
+        case INSERT_HEADING_3: {
+            std::cout << "Heading 3" << std::endl;
+            newSize = 12 * 2;
+            break;
+        }
+        case INSERT_HEADING_4: {
+            std::cout << "Heading 4" << std::endl;
+            newSize = 12 * 1.5;
+            break;
+        }
+        case INSERT_HEADING_5: {
+            std::cout << "Heading 5" << std::endl;
+            newSize = 12 * 1;
+            break;
+        }
+        case INSERT_HEADING_6: {
+            std::cout << "Heading 6" << std::endl;
+            newSize = 12 * 0.5;
+
+            break;
+        }
+        default:
+            std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
+            break;
+    }
+    textAttr.SetFontSize(newSize);
+
+    if (start != end) {
+        richTextBox->SetStyle(start, end, textAttr);
+    }
+    richTextBox->SetDefaultStyle(textAttr);
 }
 
 // ####################

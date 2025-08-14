@@ -41,6 +41,7 @@ public:
     static std::string SHORTCUT_HISTORY;
     static std::string SHORTCUT_DETAILS;
     static std::string SHORTCUT_DELETE_FILE;
+
     static std::string SHORTCUT_UNDO;
     static std::string SHORTCUT_REDO;
     static std::string SHORTCUT_CUT;
@@ -50,17 +51,29 @@ public:
     static std::string SHORTCUT_DELETE;
     static std::string SHORTCUT_FIND;
     static std::string SHORTCUT_REPLACE;
+
     static std::string SHORTCUT_ZOOM_IN;
     static std::string SHORTCUT_ZOOM_OUT;
+
+    static std::string SHORTCUT_HEADER_1;
+    static std::string SHORTCUT_HEADER_2;
+    static std::string SHORTCUT_HEADER_3;
+    static std::string SHORTCUT_HEADER_4;
+    static std::string SHORTCUT_HEADER_5;
+    static std::string SHORTCUT_HEADER_6;
+
     static std::string SHORTCUT_BOLD;
     static std::string SHORTCUT_ITALIC;
     static std::string SHORTCUT_UNDERLINE;
     static std::string SHORTCUT_STRIKETHROUGH;
+
     static std::string SHORTCUT_LIST_BULLET;
     static std::string SHORTCUT_LIST_NUMBER;
     static std::string SHORTCUT_LIST_PLAIN;
+
     static std::string SHORTCUT_INCREASE_INDENT;
     static std::string SHORTCUT_DECREASE_INDENT;
+
     static std::string SHORTCUT_SEARCH_FILE;
     static std::string SHORTCUT_SEARCH_FILE_ARCHIVE;
     static std::string SHORTCUT_SEARCH_GRIMOIRE;

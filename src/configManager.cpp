@@ -33,6 +33,7 @@ std::string ConfigMan::SHORTCUT_RENAME;
 std::string ConfigMan::SHORTCUT_HISTORY;
 std::string ConfigMan::SHORTCUT_DETAILS;
 std::string ConfigMan::SHORTCUT_DELETE_FILE;
+
 std::string ConfigMan::SHORTCUT_UNDO;
 std::string ConfigMan::SHORTCUT_REDO;
 std::string ConfigMan::SHORTCUT_CUT;
@@ -42,17 +43,29 @@ std::string ConfigMan::SHORTCUT_SELECT_ALL;
 std::string ConfigMan::SHORTCUT_DELETE;
 std::string ConfigMan::SHORTCUT_FIND;
 std::string ConfigMan::SHORTCUT_REPLACE;
+
 std::string ConfigMan::SHORTCUT_ZOOM_IN;
 std::string ConfigMan::SHORTCUT_ZOOM_OUT;
+
 std::string ConfigMan::SHORTCUT_BOLD;
 std::string ConfigMan::SHORTCUT_ITALIC;
 std::string ConfigMan::SHORTCUT_UNDERLINE;
 std::string ConfigMan::SHORTCUT_STRIKETHROUGH;
+
 std::string ConfigMan::SHORTCUT_LIST_BULLET;
 std::string ConfigMan::SHORTCUT_LIST_NUMBER;
 std::string ConfigMan::SHORTCUT_LIST_PLAIN;
+
 std::string ConfigMan::SHORTCUT_INCREASE_INDENT;
 std::string ConfigMan::SHORTCUT_DECREASE_INDENT;
+
+std::string ConfigMan::SHORTCUT_HEADER_1;
+std::string ConfigMan::SHORTCUT_HEADER_2;
+std::string ConfigMan::SHORTCUT_HEADER_3;
+std::string ConfigMan::SHORTCUT_HEADER_4;
+std::string ConfigMan::SHORTCUT_HEADER_5;
+std::string ConfigMan::SHORTCUT_HEADER_6;
+
 std::string ConfigMan::SHORTCUT_SEARCH_FILE;
 std::string ConfigMan::SHORTCUT_SEARCH_FILE_ARCHIVE;
 std::string ConfigMan::SHORTCUT_SEARCH_GRIMOIRE;
@@ -82,6 +95,7 @@ void ConfigMan::LoadConfig() {
     SHORTCUT_HISTORY =                  CheckValue("SHORTCUTS", "HISTORY",                  "CTRL+SHIFT+H");
     SHORTCUT_DETAILS =                  CheckValue("SHORTCUTS", "DETAILS",                  "");
     SHORTCUT_DELETE_FILE =              CheckValue("SHORTCUTS", "DELETE_FILE",              "");
+
     SHORTCUT_UNDO =                     CheckValue("SHORTCUTS", "UNDO",                     "CTRL+Z");
     SHORTCUT_REDO =                     CheckValue("SHORTCUTS", "REDO",                     "CTRL+SHIFT+Z");
     SHORTCUT_CUT =                      CheckValue("SHORTCUTS", "CUT",                      "CTRL+X");
@@ -91,17 +105,29 @@ void ConfigMan::LoadConfig() {
     SHORTCUT_DELETE_FILE =              CheckValue("SHORTCUTS", "DELETE",                   "");
     SHORTCUT_FIND =                     CheckValue("SHORTCUTS", "FIND",                     "CTRL+F");
     SHORTCUT_REPLACE =                  CheckValue("SHORTCUTS", "REPLACE",                  "CTRL+R");
+
     SHORTCUT_ZOOM_IN =                  CheckValue("SHORTCUTS", "ZOOM_IN",                  "CTRL+=");
     SHORTCUT_ZOOM_OUT =                 CheckValue("SHORTCUTS", "ZOOM_OUT",                 "CTRL+-");
+
+    SHORTCUT_HEADER_1 =                 CheckValue("SHORTCUTS", "HEADER_1",                 "CTRL+ALT+1");
+    SHORTCUT_HEADER_2 =                 CheckValue("SHORTCUTS", "HEADER_2",                 "CTRL+ALT+2");
+    SHORTCUT_HEADER_3 =                 CheckValue("SHORTCUTS", "HEADER_3",                 "CTRL+ALT+3");
+    SHORTCUT_HEADER_4 =                 CheckValue("SHORTCUTS", "HEADER_4",                 "CTRL+ALT+4");
+    SHORTCUT_HEADER_5 =                 CheckValue("SHORTCUTS", "HEADER_5",                 "CTRL+ALT+5");
+    SHORTCUT_HEADER_6 =                 CheckValue("SHORTCUTS", "HEADER_6",                 "CTRL+ALT+6");
+
     SHORTCUT_BOLD =                     CheckValue("SHORTCUTS", "BOLD",                     "CTRL+B");
     SHORTCUT_ITALIC =                   CheckValue("SHORTCUTS", "ITALIC",                   "CTRL+I");
     SHORTCUT_UNDERLINE =                CheckValue("SHORTCUTS", "UNDERLINE",                "CTRL+U");
     SHORTCUT_STRIKETHROUGH =            CheckValue("SHORTCUTS", "STRIKETHROUGH",            "CTRL+SHIFT+B");
+
     SHORTCUT_LIST_BULLET =              CheckValue("SHORTCUTS", "LIST_BULLET",              "CTRL+SHIFT+*");
     SHORTCUT_LIST_NUMBER =              CheckValue("SHORTCUTS", "LIST_NUMBER",              "CTRL+SHIFT+#");
     SHORTCUT_LIST_PLAIN =               CheckValue("SHORTCUTS", "LIST_PLAIN",               "CTRL+SHIFT+_");
+
     SHORTCUT_INCREASE_INDENT =          CheckValue("SHORTCUTS", "INCREASE_INDENT",          "CTRL+ALT+=");
     SHORTCUT_DECREASE_INDENT =          CheckValue("SHORTCUTS", "DECREASE_INDENT",          "CTRL+ALT+-");
+
     SHORTCUT_SEARCH_FILE =              SHORTCUT_FIND; // CheckValue("SHORTCUTS", "SEARCH_FILE",              "CTRL+F"); //Redundant
     SHORTCUT_SEARCH_FILE_ARCHIVE =      CheckValue("SHORTCUTS", "SEARCH_FILE_ARCHIVE",      "");
     SHORTCUT_SEARCH_GRIMOIRE =          CheckValue("SHORTCUTS", "SEARCH_GRIMOIRE",          "");
