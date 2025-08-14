@@ -186,3 +186,18 @@ void FindReplace_Window::ReplaceText(wxCommandEvent& event) {
         }
     } while (FindText(event) == true && replaceAll);
 }
+
+void FindReplace_Window::Populate(bool replace) {
+    wxString term = richTextBox->GetStringSelection();
+    if (term != "") {
+        TBX_FindInput->SetValue(term);
+    }
+
+    if (replace) {
+        TBX_ReplaceInput->SetFocus();
+        TBX_ReplaceInput->SelectAll();
+    } else {
+        TBX_FindInput->SetFocus();
+        TBX_FindInput->SelectAll();
+    }
+}

@@ -237,28 +237,35 @@ void EditorWindow::Edit_Delete(wxCommandEvent &event) {
 
     richTextBox->DeleteSelection();
 }
-//FIXME
+long frWinID = 0;
 void EditorWindow::Edit_FindReplace(wxCommandEvent &event) {
+    FindReplace_Window* frWin = nullptr;
+    if (FindWindowById(frWinID) != NULL) {
+        frWin = dynamic_cast<FindReplace_Window*>(FindWindowById(frWinID));
+    }
+
+    if (frWin == nullptr) {
+        frWin = new FindReplace_Window(this, richTextBox);
+        frWinID = frWin->GetId();
+    }
+
+    frWin->Show();
+    frWin->SetFocus();
+
     switch (event.GetId()) {
         case EDIT_FIND: // Fallthrough
         case SEARCH_FILE: {
-            std::cout << "Tiggered: Find" << std::endl;
+            frWin->Populate(false);
             break;
         }
         case EDIT_REPLACE: {
-            std::cout << "Tiggered: Replace" << std::endl;
+            frWin->Populate(true);
             break;
         }
         default:
             std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
             break;
     }
-
-
-    FindReplace_Window *frWin = new FindReplace_Window(this, richTextBox);
-    // frWin->SetRichTextBox(richTextBox);
-    //frWin->Show(true);
-
 }
 // #################
 // #     View      #

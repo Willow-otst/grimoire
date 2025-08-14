@@ -15,13 +15,15 @@ private:
     wxTextCtrl* TBX_FindInput;
     wxTextCtrl* TBX_ReplaceInput;
 
+    void FindText_Helper(wxCommandEvent& event);
+    bool FindText(wxCommandEvent& event);
+    void ReplaceText(wxCommandEvent& event);
+
 public:
     FindReplace_Window(wxWindow* parent, wxRichTextCtrl* richTextPointer);
     ~FindReplace_Window();
 
-    void FindText_Helper(wxCommandEvent& event);
-    bool FindText(wxCommandEvent& event);
-    void ReplaceText(wxCommandEvent& event);
+    void Populate(bool replace);
 };
 
 enum {
