@@ -289,42 +289,21 @@ void EditorWindow::Edit_FindReplace(wxCommandEvent &event) {
 // #     View      #
 // #################
 void EditorWindow::View_Zoom(wxCommandEvent &event) {
-    long initial, start, end;
-    initial = richTextBox->GetInsertionPoint();
-    richTextBox->SelectAll();
-    richTextBox->GetSelection(&start, &end);
-
-    wxTextAttr textAttr;
-    if (start == end) {
-        start = richTextBox->GetInsertionPoint();
-    }
-    richTextBox->GetStyle(start, textAttr);
-
-    int newSize = textAttr.GetFontSize();
-    wxTextAttr textAttr2;
-    textAttr = textAttr2; // Empties the Syle so we dont overwrite existing attribues, only size
     switch (event.GetId()) {
         case VIEW_ZOOM_IN: {
-            newSize += 1;
+            richTextBox->SetScale(richTextBox->GetScale() + 0.1);
             break;
         }
         case VIEW_ZOOM_OUT: {
-            if (newSize == 1) { break; }
-            newSize -= 1;
+            if (richTextBox->GetScale() <= 0.2) {return;}
+            richTextBox->SetScale(richTextBox->GetScale() - 0.1);
             break;
         }
         default:
             std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
-            break;
+            return;
     }
-
-    textAttr.SetFontSize(newSize);
-
-    if (start != end) {
-        richTextBox->SetStyle(start, end, textAttr);
-    }
-    richTextBox->SetDefaultStyle(textAttr);
-    richTextBox->SetInsertionPoint(initial);
+    this->Refresh();
 }
 // ################
 // #    Insert    #
