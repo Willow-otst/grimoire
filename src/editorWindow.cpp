@@ -219,7 +219,7 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
             richTextBox->WriteText(appendProperties + " ");
         }
 
-        richTextBox->ShowPosition(richTextBox->GetLastPosition());
+        richTextBox->ShowPosition(richTextBox->GetInsertionPoint());
 
         return;             // exit so we dont replay default Behaviour
     }
@@ -309,7 +309,6 @@ void EditorWindow::View_Zoom(wxCommandEvent &event) {
 // #    Insert    #
 // ################
 void EditorWindow::Insert_Heading(wxCommandEvent &event) {
-    // FIXME
     long start, end;
     richTextBox->GetSelection(&start, &end);
 
@@ -320,9 +319,6 @@ void EditorWindow::Insert_Heading(wxCommandEvent &event) {
     richTextBox->GetStyle(start, textAttr);
 
     int newSize = textAttr.GetFontSize();
-
-    //richTextBox->SelectAll();
-    //richTextBox->SetInsertionPoint(initial);
 
     switch (event.GetId()) {
         case INSERT_HEADING_1: {
