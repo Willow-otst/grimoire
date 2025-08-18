@@ -15,4 +15,9 @@ if(wxWidgets_USE_FILE) # not defined in CONFIG mode
 endif()
 target_link_libraries(${CMAKE_PROJECT_NAME} ${wxWidgets_LIBRARIES})
 
+# lib/
 include_directories("lib/TOML")
+
+file(GLOB_RECURSE SQLITE_SOURCES "lib/sqlite/src/*.c")
+list(APPEND SOURCES ${SQLITE_SOURCES})
+include_directories("lib/sqlite/include")
