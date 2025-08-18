@@ -2,6 +2,6 @@ build/
 bin/
 *.sh
 TODO.txt
-lib/TOML/
+lib/
 grimoire.config
 *.disabled

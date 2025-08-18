@@ -15,7 +15,7 @@
 ## The Features:
 ### MVP:
 - Live "WYSIWYG" Rich Text Editor (headers, bold, indents etc..).
-	- "WYSIWYG" = "What You See Is What You Get"
+    - "WYSIWYG" = "What You See Is What You Get"
 - Saving Notes in the DB
 - Loading Notes from the DB
 - Searching Notes in the DB (Using FTS5)
@@ -25,7 +25,7 @@
 ### Extras:
 - Jump-Links to and between notes.
 - Collapsable Headers/Bulleted Lists
-- Saving / Loading Note History (Likly in a seperate DB)
+- Saving / Loading Note History (Likely in a separate DB)
 - Archival Search (searching note history)
 - Multi-Tab & Multi-Window Support (Like a web Browser)
 - Dark mode / Theme Support
@@ -37,10 +37,11 @@
 
 ## Log
 1. Migrated from QT to FLTK
-	* QT Was too high-level and offered little in terms of custom tooling.
-	* Moved to FLTK for more Direct Control over the codebase and app functionality.
+    * QT Was too high-level and offered little in terms of custom tooling.
+    * Moved to FLTK for more Direct Control over the codebase and app functionality.
+    
 2. Migrated from FLTK to wxWidgets
-	* Moved to wx for out of the box rich text support.
-	* FLTK was Awesome to work with, it was really easy to get going and would have been quite maintainable.
-	* Honestly if not for that, I would have kept using it and will probably use it in the future for simpler projects.
-	* wxWidgets should offer a nice middle ground between the complexity of Qt and FLTK's Lack of hand holding.
+    * Moved to wx for out of the box rich text support.
+    * FLTK was Awesome to work with, it was really easy to get going and would have been quite maintainable.
+    * Honestly if not for that, I would have kept using it and will probably use it in the future for simpler projects.
+    * wxWidgets should offer a nice middle ground between the complexity of Qt and FLTK's Lack of hand holding.
