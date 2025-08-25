@@ -5,6 +5,7 @@
 #include "editorWindow.h"
 #include "findReplace_Window.h"
 #include "configManager.h"
+#include "dataManager.h"
 
 #include <string>
 #include <iostream>
@@ -13,6 +14,8 @@
 bool GApp::OnInit() {
     ConfigMan::LoadConfig();
     ConfigMan::SaveConfig();
+
+    DataMan::Test();
 
     EditorWindow *eWindow = new EditorWindow();  // Create the main frame window
     eWindow->Show(true);                         // Show the frame
@@ -128,6 +131,7 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
 
     SetMenuBar(menuBar);
 
+    wxTextCtrl* titleBox = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize);
 
     richTextBox = new wxRichTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE);
     // Default Style
@@ -139,11 +143,18 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     textAttr.SetFontUnderlined(wxTEXT_ATTR_UNDERLINE_NONE);
     textAttr.SetBackgroundColour(wxTransparentColour);
     richTextBox->SetDefaultStyle(textAttr);
+    richTextBox->SetFocus();
 
     // richTextCtrl Custom KEY/Shortcut Behaviour
     richTextBox->Bind(wxEVT_KEY_DOWN, &EditorWindow::KeyDown, this);
     richTextBox->SetAcceleratorTable(wxNullAcceleratorTable);
 
+    wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+    mainSizer->Add(titleBox, 0, wxEXPAND | wxALL, 5);
+    mainSizer->Add(richTextBox, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 5);
+
+    this->SetSizerAndFit(mainSizer);
+    this->SetSize(wxSize(450, 500));
 }
 // #################
 // # Deconstructor #
