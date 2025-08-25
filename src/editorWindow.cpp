@@ -12,10 +12,11 @@
 #include <format>
 
 bool GApp::OnInit() {
-    ConfigMan::LoadConfig();
-    ConfigMan::SaveConfig();
-
+    DataMan::ValidateDataPaths();
     DataMan::Test();
+
+    ConfigMan::LoadConfig(DataMan::GetPath_Config());
+    ConfigMan::SaveConfig(DataMan::GetPath_Config());
 
     EditorWindow *eWindow = new EditorWindow();  // Create the main frame window
     eWindow->Show(true);                         // Show the frame
@@ -36,7 +37,7 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
         menuFile->Append(FILE_LOAD,         "Load\t" + ConfigMan::SHORTCUT_LOAD, "");
         menuFile->Append(FILE_NEW,          "New\t" + ConfigMan::SHORTCUT_NEW, "");
         menuFile->AppendSeparator();
-        menuFile->Append(FILE_RENAME,       "Rename\t" + ConfigMan::SHORTCUT_RENAME, "");
+        //menuFile->Append(FILE_RENAME,       "Rename\t" + ConfigMan::SHORTCUT_RENAME, "");
         menuFile->Append(FILE_HISTORY,      "History\t" + ConfigMan::SHORTCUT_HISTORY, "");
         menuFile->AppendSeparator();
         menuFile->Append(FILE_DETAILS,      "Details\t" + ConfigMan::SHORTCUT_DETAILS, "");

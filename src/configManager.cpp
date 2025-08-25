@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 //
 // CONFIG MANAGER
 //
-std::string ConfigMan::cfgPath = "data/grimoire.config";
+//std::string ConfigMan::cfgPath = "data/grimoire.config";
 toml::table ConfigMan::cfgTable;
 
 // CONFIG -> TAB
@@ -76,7 +76,7 @@ std::string ConfigMan::SHORTCUT_GRIMOIRE_NEW;
 std::string ConfigMan::SHORTCUT_GRIMOIRE_RENAME;
 std::string ConfigMan::SHORTCUT_GRIMOIRE_DELETE;
 
-void ConfigMan::LoadConfig() {
+void ConfigMan::LoadConfig(std::string cfgPath) {
     if (!fs::exists(cfgPath)) {
         std::ofstream file(cfgPath);
         file.close();
@@ -145,7 +145,7 @@ void ConfigMan::LoadConfig() {
 
     //std::cout << cfgTable << std::endl;
 }
-void ConfigMan::SaveConfig() {
+void ConfigMan::SaveConfig(std::string cfgPath) {
     std::ofstream file(cfgPath);
 
     if (!file.is_open()) { return; }

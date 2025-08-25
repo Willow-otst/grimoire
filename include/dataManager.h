@@ -6,6 +6,10 @@ private:
     DataMan() = delete;
     ~DataMan() = delete;
 
+    static const std::string PATH_DIR_DATA;
+    static const std::string PATH_DIR_DB;
+    static const std::string PATH_FILE_CONFIG;
+
     struct DocData {
         enum enum_EncodeType {
             NONE
@@ -32,12 +36,15 @@ public:
      * LOAD FILE
      * DELETE FILE
      *
-     * CREATE GRIMOIRE
-     * SAVE GRIMOIRE
+     * NEW GRIMOIRE
      * LOAD GRIMOIRE
      * DELETE GRIMOIRE
      */
 
     static void Test();
 
+    // PATHS
+    static void ValidateDataPaths();
+    static std::string GetPath_DB();
+    static std::string GetPath_Config();
 };

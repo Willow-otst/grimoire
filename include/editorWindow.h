@@ -58,7 +58,7 @@ enum {
     FILE_SAVE,
     FILE_LOAD,
     FILE_NEW,
-    FILE_RENAME,
+    //FILE_RENAME,
     FILE_HISTORY,
     FILE_DETAILS,
     FILE_DELETE_FILE,

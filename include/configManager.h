@@ -8,7 +8,7 @@ private:
     ConfigMan() = delete;
     ~ConfigMan() = delete;
 
-    static std::string cfgPath;
+    //static std::string cfgPath;
     static toml::table cfgTable;
 
     static void CheckTable(const std::string &name);
@@ -21,8 +21,8 @@ private:
         const std::string &valueName,
         int value);
 public:
-    static void LoadConfig();
-    static void SaveConfig();
+    static void LoadConfig(std::string cfgPath);
+    static void SaveConfig(std::string cfgPath);
 
     // CONFIG -> TAB
     static int TAB_SIZE;
