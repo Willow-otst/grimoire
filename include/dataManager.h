@@ -6,6 +6,7 @@ private:
     DataMan() = delete;
     ~DataMan() = delete;
 
+    static const std::string PATH_BASE;
     static const std::string PATH_DIR_DATA;
     static const std::string PATH_DIR_DB;
     static const std::string PATH_FILE_CONFIG;

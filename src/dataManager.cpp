@@ -11,7 +11,21 @@
 // #   Paths   #
 // #############
 namespace fs = std::filesystem;
-const std::string DataMan::PATH_DIR_DATA =    "data/";
+const std::string DataMan::PATH_BASE = []() -> std::string {
+    #ifdef _WIN32
+    char path[MAX_PATH];
+    GetModuleFileNameA(NULL, path, MAX_PATH);
+    return std::filesystem::path(path).parent_path().string();
+    #elif __linux__
+    char path[PATH_MAX];
+    ssize_t count = readlink("/proc/self/exe", path, PATH_MAX);
+    if (count == -1) throw std::runtime_error("Failed to read executable path");
+    return std::filesystem::path(std::string(path, count)).parent_path().string();
+    #else
+    throw std::runtime_error("Unsupported platform");
+    #endif
+}() + "/";
+const std::string DataMan::PATH_DIR_DATA =    PATH_BASE +     "data/";
 const std::string DataMan::PATH_DIR_DB =      PATH_DIR_DATA + "db/";
 const std::string DataMan::PATH_FILE_CONFIG = PATH_DIR_DATA + "grimoire.config";
 void DataMan::ValidateDataPaths() {
