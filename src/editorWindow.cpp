@@ -129,19 +129,37 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
         menuSearch->Append(SEARCH_GRIMOIRE_ARCHIVE, "Search Grimoire Archive\t" + ConfigMan::SHORTCUT_SEARCH_GRIMOIRE_ARCHIVE, "");
     menuBar->Append(menuSearch, "&Search");
 
+    // Grimoire
+    wxMenu *menuGrimoire = new wxMenu();
+        menuGrimoire->Append(GRIMOIRE_LOAD,     "Load Grimoire\t" + ConfigMan::SHORTCUT_GRIMOIRE_LOAD, "");
+        Bind(wxEVT_MENU, &EditorWindow::Grimoire, this, GRIMOIRE_LOAD);
+        menuGrimoire->Append(GRIMOIRE_NEW,     "New Grimoire\t" + ConfigMan::SHORTCUT_GRIMOIRE_NEW, "");
+        Bind(wxEVT_MENU, &EditorWindow::Grimoire, this, GRIMOIRE_NEW);
+        menuGrimoire->AppendSeparator();
+        menuGrimoire->Append(GRIMOIRE_RENAME,     "Rename Grimoire\t" + ConfigMan::SHORTCUT_GRIMOIRE_RENAME, "");
+        Bind(wxEVT_MENU, &EditorWindow::Grimoire, this, GRIMOIRE_RENAME);
+        menuGrimoire->AppendSeparator();
+        menuGrimoire->Append(GRIMOIRE_DELETE,     "Delete Grimoire\t" + ConfigMan::SHORTCUT_GRIMOIRE_DELETE, "");
+        Bind(wxEVT_MENU, &EditorWindow::Grimoire, this, GRIMOIRE_DELETE);
+    menuBar->Append(menuGrimoire, "&Grimoire");
+
     SetMenuBar(menuBar);
 
-    wxTextCtrl* titleBox = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize);
-
-    richTextBox = new wxRichTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE);
     // Default Style
     wxFont courierFont(wxFontInfo(12).FaceName("Courier New").Family(wxFONTFAMILY_MODERN));
-    richTextBox->SetFont(courierFont);
     wxTextAttr textAttr;
+    textAttr.SetFont(courierFont);
     textAttr.SetFontWeight(wxFONTWEIGHT_NORMAL);
     textAttr.SetFontStyle(wxFONTSTYLE_NORMAL);
     textAttr.SetFontUnderlined(wxTEXT_ATTR_UNDERLINE_NONE);
     textAttr.SetBackgroundColour(wxTransparentColour);
+
+    // Title bar
+    wxTextCtrl* titleBox = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize);
+    titleBox->SetDefaultStyle(textAttr);
+
+    // main edidor
+    richTextBox = new wxRichTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE);
     richTextBox->SetDefaultStyle(textAttr);
     richTextBox->SetFocus();
 
@@ -149,6 +167,7 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     richTextBox->Bind(wxEVT_KEY_DOWN, &EditorWindow::KeyDown, this);
     richTextBox->SetAcceleratorTable(wxNullAcceleratorTable);
 
+    // Layout
     wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
     mainSizer->Add(titleBox, 0, wxEXPAND | wxALL, 5);
     mainSizer->Add(richTextBox, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 5);
@@ -637,4 +656,27 @@ void EditorWindow::Format_Indent(wxCommandEvent &event) {
     }
 
     richTextBox->SetSelection(startPos, endPos);
+}
+
+// ###############
+// #   GIMOIRE   #
+// ###############
+void EditorWindow::Grimoire(wxCommandEvent &event) {
+    switch (event.GetId()) {
+        case GRIMOIRE_LOAD: {
+            std::cout << "GRIMOIRE_LOAD" << std::endl;
+            break; }
+        case GRIMOIRE_NEW: {
+            std::cout << "GRIMOIRE_NEW" << std::endl;
+            break; }
+        case GRIMOIRE_RENAME: {
+            std::cout << "GRIMOIRE_RENAME" << std::endl;
+            break; }
+        case GRIMOIRE_DELETE: {
+            std::cout << "GRIMOIRE_DELETE" << std::endl;
+            break; }
+        default:
+            std::cout << "ERROR - Incorrect ID passed: " << event.GetId() << std::endl;
+            break;
+    }
 }

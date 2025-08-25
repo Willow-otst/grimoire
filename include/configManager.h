@@ -79,4 +79,9 @@ public:
     static std::string SHORTCUT_SEARCH_GRIMOIRE;
     static std::string SHORTCUT_SEARCH_GRIMOIRE_ARCHIVE;
 
+    static std::string SHORTCUT_GRIMOIRE_LOAD;
+    static std::string SHORTCUT_GRIMOIRE_NEW;
+    static std::string SHORTCUT_GRIMOIRE_RENAME;
+    static std::string SHORTCUT_GRIMOIRE_DELETE;
+
 };

@@ -19,6 +19,9 @@ public:
     // Custom Key Behaviour
     void KeyDown(wxKeyEvent& event);
 
+    // FILE
+
+
     // EDIT
     void Edit_Undo(wxCommandEvent &event);
     void Edit_Redo(wxCommandEvent &event);
@@ -41,6 +44,9 @@ public:
     void Format_List(wxCommandEvent &event);
     // FORMAT -> INDENT
     void Format_Indent(wxCommandEvent &event);
+
+    // GRIMOIRE
+    void Grimoire(wxCommandEvent &event);
 };
 
 
@@ -99,7 +105,11 @@ enum {
     SEARCH_GRIMOIRE,
     SEARCH_GRIMOIRE_ARCHIVE,
 
-
+    // Grimoire
+    GRIMOIRE_LOAD,
+    GRIMOIRE_NEW,
+    GRIMOIRE_RENAME,
+    GRIMOIRE_DELETE,
 
     //wx standard operations
     STANDARD_APP_QUIT = wxID_EXIT,

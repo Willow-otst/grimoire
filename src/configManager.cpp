@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 //
 // CONFIG MANAGER
 //
-std::string ConfigMan::cfgPath = "grimoire.config";
+std::string ConfigMan::cfgPath = "data/grimoire.config";
 toml::table ConfigMan::cfgTable;
 
 // CONFIG -> TAB
@@ -71,6 +71,11 @@ std::string ConfigMan::SHORTCUT_SEARCH_FILE_ARCHIVE;
 std::string ConfigMan::SHORTCUT_SEARCH_GRIMOIRE;
 std::string ConfigMan::SHORTCUT_SEARCH_GRIMOIRE_ARCHIVE;
 
+std::string ConfigMan::SHORTCUT_GRIMOIRE_LOAD;
+std::string ConfigMan::SHORTCUT_GRIMOIRE_NEW;
+std::string ConfigMan::SHORTCUT_GRIMOIRE_RENAME;
+std::string ConfigMan::SHORTCUT_GRIMOIRE_DELETE;
+
 void ConfigMan::LoadConfig() {
     if (!fs::exists(cfgPath)) {
         std::ofstream file(cfgPath);
@@ -127,6 +132,11 @@ void ConfigMan::LoadConfig() {
 
     SHORTCUT_INCREASE_INDENT =          CheckValue("SHORTCUTS", "INCREASE_INDENT",          "CTRL+ALT+=");
     SHORTCUT_DECREASE_INDENT =          CheckValue("SHORTCUTS", "DECREASE_INDENT",          "CTRL+ALT+-");
+
+    SHORTCUT_GRIMOIRE_LOAD =            CheckValue("SHORTCUTS", "GRIMOIRE_LOAD",            "");
+    SHORTCUT_GRIMOIRE_NEW =             CheckValue("SHORTCUTS", "GRIMOIRE_NEW",             "");
+    SHORTCUT_GRIMOIRE_RENAME =          CheckValue("SHORTCUTS", "GRIMOIRE_RENAME",          "");
+    SHORTCUT_GRIMOIRE_DELETE =          CheckValue("SHORTCUTS", "GRIMOIRE_DELETE",          "");
 
     SHORTCUT_SEARCH_FILE =              SHORTCUT_FIND; // CheckValue("SHORTCUTS", "SEARCH_FILE",              "CTRL+F"); //Redundant
     SHORTCUT_SEARCH_FILE_ARCHIVE =      CheckValue("SHORTCUTS", "SEARCH_FILE_ARCHIVE",      "");
