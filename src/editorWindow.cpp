@@ -12,7 +12,7 @@
 #include <format>
 
 bool GApp::OnInit() {
-    DataMan::ValidateDataPaths();
+    DataMan::ValidateDefaultPaths();
     DataMan::Test();
 
     ConfigMan::LoadConfig(DataMan::GetPath_Config());
@@ -316,6 +316,7 @@ void EditorWindow::Edit_FindReplace(wxCommandEvent &event) {
             break;
     }
 }
+
 // #################
 // #     View      #
 // #################
@@ -336,6 +337,7 @@ void EditorWindow::View_Zoom(wxCommandEvent &event) {
     }
     this->Refresh();
 }
+
 // ################
 // #    Insert    #
 // ################
@@ -663,21 +665,227 @@ void EditorWindow::Format_Indent(wxCommandEvent &event) {
 // #   GIMOIRE   #
 // ###############
 void EditorWindow::Grimoire(wxCommandEvent &event) {
+    enum DBManageState {
+        LOAD_SELECTION,
+        QUERY_SELECTION,
+        CREATE_SELECTION,
+        RENAME_SELECTION,
+        DELETE_SELECTION,
+        ABORT_SELECTION,
+        COMPLETE_SELECTION
+    };
+    DBManageState state = LOAD_SELECTION;
+
     switch (event.GetId()) {
         case GRIMOIRE_LOAD: {
-            std::cout << "GRIMOIRE_LOAD" << std::endl;
+            state = QUERY_SELECTION;
             break; }
         case GRIMOIRE_NEW: {
-            std::cout << "GRIMOIRE_NEW" << std::endl;
+            state = CREATE_SELECTION;
             break; }
         case GRIMOIRE_RENAME: {
-            std::cout << "GRIMOIRE_RENAME" << std::endl;
+            state = RENAME_SELECTION;
             break; }
         case GRIMOIRE_DELETE: {
-            std::cout << "GRIMOIRE_DELETE" << std::endl;
+            state = DELETE_SELECTION;
             break; }
         default:
             std::cout << "ERROR - Incorrect ID passed: " << event.GetId() << std::endl;
             break;
     }
+
+    std::string DBSelection = "";
+    this->Enable(false);
+    do {
+        switch (state) {
+            case LOAD_SELECTION: {
+                DataMan::DB_Load(DataMan::GetPath_DB() + DBSelection);
+                wxMessageBox("You selected: " + DataMan::Get_NameFromPath(DataMan::DB_GetSelectedDB()), "Selection");
+                state = COMPLETE_SELECTION;
+                break; } ///////////////////////////////////////////////////////////////////////
+            case QUERY_SELECTION: {
+                wxArrayString knownDBs;
+                knownDBs.Add("<Create New>");
+
+                for (std::string entry : DataMan::Get_DBFilePaths()) {
+                    knownDBs.Add(entry);
+                }
+
+                wxSingleChoiceDialog loadDialog(
+                    this,
+                    "Select a DB to Load:",
+                    "Choose Option",
+                    knownDBs
+                );
+                if (loadDialog.ShowModal() != wxID_OK) {
+                    state = ABORT_SELECTION;
+                    break;
+                }
+                DBSelection = loadDialog.GetStringSelection().ToStdString();
+                if (DBSelection == "<Create New>") {
+                    state = CREATE_SELECTION;
+                    break;
+                }
+                state = LOAD_SELECTION;
+                break; }///////////////////////////////////////////////////////////////////////
+            case CREATE_SELECTION: {
+                wxTextEntryDialog newEntryDialog(this,
+                                         "Enter a name for the new DB:",
+                                         "New DB");
+                if (newEntryDialog.ShowModal() != wxID_OK) {
+                    state = ABORT_SELECTION;
+                    break;
+                }
+                std::string value = newEntryDialog.GetValue().ToStdString();
+                if (newEntryDialog.GetValue() == "") {
+                    wxMessageBox("DB Name Cannot be Blank!", "Error");
+                    state = CREATE_SELECTION;
+                    break;
+                }
+                if (value.length() < 4 || value.substr(value.length() -3, 3) != ".db") {
+                    value += ".db";
+                }
+                wxMessageDialog validateCreation(
+                    this,
+                    "Is this Correct?\n"
+                    "Name: " + DataMan::Get_NameFromPath(value),
+                    "Confirm Creation",
+                    wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION
+                );
+                if (validateCreation.ShowModal() != wxID_YES) {
+                    state = CREATE_SELECTION;
+                    break;
+                }
+                DBSelection = value;
+                value = DataMan::GetPath_DB() + "/" + DBSelection;
+                if (DataMan::Get_FilePathExists(value)) {
+                    wxMessageDialog validateOverwrite(
+                        this,
+                        "File Already Exists! Do you want to Overwrite?\n"
+                        "Name: " + DataMan::Get_NameFromPath(DBSelection),
+                        "Confirm Overwrite",
+                        wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION
+                    );
+                    if (validateOverwrite.ShowModal() != wxID_YES) {
+                        state = CREATE_SELECTION;
+                        break;
+                    }
+                    DataMan::DB_Delete(value);
+                }
+                if (!DataMan::DB_Create(value)) {
+                    wxMessageBox("Could Not Create DB!\n"
+                    "Name: " + DataMan::Get_NameFromPath(value), "Error");
+                    state = CREATE_SELECTION;
+                    break;
+                }
+                state = LOAD_SELECTION;
+                break; }///////////////////////////////////////////////////////////////////////
+            case RENAME_SELECTION: {
+                if (DataMan::DB_GetSelectedDB() == "") {
+                    wxMessageBox("No DB Selected to Rename!\n"
+                    "This should Never have Happened,\n"
+                    "but you must now Select or create a DB!", "Error");
+                    state = QUERY_SELECTION;
+                    break;
+                }
+                DBSelection = DataMan::DB_GetSelectedDB();
+                wxTextEntryDialog renameDialog(this,
+                                            "Enter a new name for:\n" + DataMan::Get_NameFromPath(DBSelection),
+                                            "Rename DB");
+                if (renameDialog.ShowModal() != wxID_OK) {
+                    state = ABORT_SELECTION;
+                    break;
+                }
+                std::string value = renameDialog.GetValue().ToStdString();
+                if (renameDialog.GetValue() == "") {
+                    wxMessageBox("DB Name Cannot be Blank!", "Error");
+                    state = RENAME_SELECTION;
+                    break;
+                }
+                if (value.length() < 4 || value.substr(value.length() -3, 3) != ".db") {
+                    value += ".db";
+                }
+                wxMessageDialog validateRename(
+                    this,
+                    "Is this Correct?\n"
+                    "From: " + DataMan::Get_NameFromPath(DBSelection) + "\n"
+                    "To: " + DataMan::Get_NameFromPath(value),
+                    "Confirm Rename",
+                    wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION
+                );
+                if (validateRename.ShowModal() != wxID_YES) {
+                    state = RENAME_SELECTION;
+                    break;
+                }
+                //DBSelection = value;
+                value = DataMan::GetPath_DB() + "/" + value;
+                if (DataMan::Get_FilePathExists(value)) {
+                    wxMessageDialog validateOverwrite(
+                        this,
+                        "File Already Exists! Do you want to Overwrite?\n"
+                        "Name: " + DataMan::Get_NameFromPath(DBSelection),
+                        "Confirm Overwrite",
+                        wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION
+                    );
+                    if (validateOverwrite.ShowModal() != wxID_YES) {
+                        state = RENAME_SELECTION;
+                        break;
+                    }
+                    DataMan::DB_Delete(value);
+                }
+                if (!DataMan::DB_Create(value)) {
+                    wxMessageBox("Could Not Rename DB!\n"
+                    "Name: " + DataMan::Get_NameFromPath(value), "Error");
+                    state = RENAME_SELECTION;
+                    break;
+                }
+                DataMan::DB_Delete(value);
+                DataMan::DB_Rename(DBSelection, value);
+                DBSelection = DataMan::Get_NameFromPath(value);
+                state = LOAD_SELECTION;
+                break; }///////////////////////////////////////////////////////////////////////
+            case DELETE_SELECTION: {
+                if (DataMan::DB_GetSelectedDB() == "") {
+                    wxMessageBox("No DB Selected to Delete!\n"
+                    "This should Never have Happened,\n"
+                    "but you must now Select or create a DB!", "Error");
+                    state = QUERY_SELECTION;
+                    break;
+                }
+                DBSelection = DataMan::DB_GetSelectedDB();
+                wxMessageDialog validateDeletion(
+                    this,
+                    "Are you Sure you want to Delete this DB?\n"
+                    "Name: " + DataMan::Get_NameFromPath(DBSelection),
+                    "Confirm Deletion",
+                    wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION
+                );
+                if (validateDeletion.ShowModal() != wxID_YES) {
+                    state = ABORT_SELECTION;
+                    break;
+                }
+                DataMan::DB_Delete(DBSelection);
+                DataMan::DB_Load("");
+                wxMessageBox("DB has been Deleted!\n"
+                             "Select or Create a new one!", "Warning");
+                state = QUERY_SELECTION;
+                break; }///////////////////////////////////////////////////////////////////////
+            case ABORT_SELECTION: {
+                if (DataMan::DB_GetSelectedDB() == "") {
+                    wxMessageBox("You Must Create or Select a DB!", "Error");
+                    state = QUERY_SELECTION;
+                    break;
+                }
+                wxMessageBox("Selected DB has Not Changed!", "Warning");
+                state = COMPLETE_SELECTION;
+                break; }///////////////////////////////////////////////////////////////////////
+            case COMPLETE_SELECTION: {
+                break; }///////////////////////////////////////////////////////////////////////
+            default:
+                std::cout << "ERROR - Incorrect ID passed: " << event.GetId() << std::endl;
+                break;
+        }
+    } while (state != COMPLETE_SELECTION);
+    this->SetTitle(DataMan::Get_StemFromPath(DataMan::DB_GetSelectedDB()));
+    this->Enable(true);
 }
