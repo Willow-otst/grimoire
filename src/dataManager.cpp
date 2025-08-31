@@ -2,10 +2,14 @@
 #include "configManager.h"
 
 #include "uuid.h" // stduuid lib
+#include "sqlite3.h"
 
 #include <iostream>
 #include <string>
 #include <filesystem>
+#include <vector>
+
+sqlite3* DataMan::selectedDB;
 
 // #############
 // #   Paths   #
@@ -28,36 +32,54 @@ const std::string DataMan::PATH_BASE = []() -> std::string {
 const std::string DataMan::PATH_DIR_DATA =    PATH_BASE +     "data/";
 const std::string DataMan::PATH_DIR_DB =      PATH_DIR_DATA + "db/";
 const std::string DataMan::PATH_FILE_CONFIG = PATH_DIR_DATA + "grimoire.config";
-void DataMan::ValidateDataPaths() {
+void DataMan::ValidateDefaultPaths() {
     std::function<void(const std::string&, bool)> check = [](const std::string path, bool isDir) {
         if (fs::exists(path)) {
-            // std::cout << "Path Exists: " + path << std::endl;
             return;
         }
 
         if (isDir) {
             fs::create_directory(path);
-            // std::cout << "Created Dir: " + path << std::endl;
             return;
         } else {
             std::ofstream file(path);
             file.close();
-            // std::cout << "Created File: " + path << std::endl;
             return;
         }
-        // std::cout << "Failed Path Creation: " + path << std::endl;
     };
 
     check(PATH_DIR_DATA, true);
     check(PATH_DIR_DB, true);
     check(PATH_FILE_CONFIG, false);
 }
+std::string DataMan::Path_File_SelectedDB;
 
+
+bool DataMan::Get_FilePathExists(std::string path) {
+    return (fs::exists(path)) ? true : false;
+}
+std::string DataMan::Get_NameFromPath(std::string path) {
+    fs::path p = path;
+    return p.filename();
+}
+std::string DataMan::Get_StemFromPath(std::string path) {
+    fs::path p = path;
+    return p.stem();
+}
 std::string DataMan::GetPath_Config() {
     return PATH_FILE_CONFIG;
 }
 std::string DataMan::GetPath_DB() {
     return PATH_DIR_DB;
+}
+std::vector<std::string> DataMan::Get_DBFilePaths() {
+    std::vector<std::string> entries;
+    for (const std::filesystem::directory_entry& entry : fs::directory_iterator(DataMan::GetPath_DB())) {
+        if (entry.path().extension() == ".db") {
+            entries.push_back(entry.path().filename());
+        }
+    }
+    return entries;
 }
 
 // ############
@@ -74,9 +96,30 @@ std::string DataMan::CreateUUIDString() {
     return uuids::to_string(gen());
 }
 
-
-
-
-void DataMan::Test() {
-
+// ##########
+// #   DB   #
+// ##########
+std::string DataMan::DB_GetSelectedDB() {
+    return Path_File_SelectedDB;
+}
+void DataMan::DB_Load(std::string path) {
+    Path_File_SelectedDB = path;
+}
+bool DataMan::DB_Create(std::string path) {
+    const char* cpath = path.c_str();
+    int dbCode = sqlite3_open(cpath, &selectedDB);
+    sqlite3_close(selectedDB);
+    if (dbCode != SQLITE_OK) {
+        return false;
+    }
+    return true;
+}
+void DataMan::DB_Rename(std::string oldPath, std::string newPath) {
+    fs::rename(oldPath, newPath);
+}
+void DataMan::DB_Delete(std::string path) {
+    if (fs::is_directory(path)) {
+        return;
+    }
+    fs::remove(path);
 }
