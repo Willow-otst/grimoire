@@ -13,7 +13,6 @@
 
 bool GApp::OnInit() {
     DataMan::ValidateDefaultPaths();
-    DataMan::Test();
 
     ConfigMan::LoadConfig(DataMan::GetPath_Config());
     ConfigMan::SaveConfig(DataMan::GetPath_Config());
