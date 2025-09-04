@@ -20,7 +20,7 @@ public:
     void KeyDown(wxKeyEvent& event);
 
     // FILE
-
+    void File_Manager(wxCommandEvent &event);
 
     // EDIT
     void Edit_Undo(wxCommandEvent &event);

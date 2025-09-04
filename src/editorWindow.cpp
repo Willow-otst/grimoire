@@ -22,7 +22,9 @@ bool GApp::OnInit() {
     return true;
 }
 
+wxTextCtrl* titleBox;
 wxRichTextCtrl *richTextBox;
+std::string currentDocUUID;
 
 // #################
 // #  Constructor  #
@@ -33,14 +35,18 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     // File
     wxMenu *menuFile = new wxMenu();
         menuFile->Append(FILE_SAVE,         "Save\t" + ConfigMan::SHORTCUT_SAVE, "Save file to Database.");
+        Bind(wxEVT_MENU, &EditorWindow::File_Manager, this, FILE_SAVE);
         menuFile->Append(FILE_LOAD,         "Load\t" + ConfigMan::SHORTCUT_LOAD, "");
+        Bind(wxEVT_MENU, &EditorWindow::File_Manager, this, FILE_LOAD);
         menuFile->Append(FILE_NEW,          "New\t" + ConfigMan::SHORTCUT_NEW, "");
+        Bind(wxEVT_MENU, &EditorWindow::File_Manager, this, FILE_NEW);
         menuFile->AppendSeparator();
         //menuFile->Append(FILE_RENAME,       "Rename\t" + ConfigMan::SHORTCUT_RENAME, "");
         menuFile->Append(FILE_HISTORY,      "History\t" + ConfigMan::SHORTCUT_HISTORY, "");
         menuFile->AppendSeparator();
         menuFile->Append(FILE_DETAILS,      "Details\t" + ConfigMan::SHORTCUT_DETAILS, "");
-        menuFile->Append(FILE_DELETE_FILE,  "Delete File\t" + ConfigMan::SHORTCUT_DELETE_FILE, "");
+        menuFile->Append(FILE_DELETE_FILE,  "Delete File\t" + ConfigMan::SHORTCUT_DELETE_FILE);
+        Bind(wxEVT_MENU, &EditorWindow::File_Manager, this, FILE_DELETE_FILE);
     menuBar->Append(menuFile, "&File");
     // Edit
     wxMenu *menuEdit = new wxMenu();
@@ -155,7 +161,7 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     textAttr.SetBackgroundColour(wxTransparentColour);
 
     // Title bar
-    wxTextCtrl* titleBox = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxDefaultSize);
+    titleBox = new wxTextCtrl(this, wxID_ANY, "untitled entry", wxDefaultPosition, wxDefaultSize);
     titleBox->SetDefaultStyle(textAttr);
 
     // main edidor
@@ -257,6 +263,55 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
     // Pass on all other Keys
     event.Skip();
 }
+
+// ############
+// #   FILE   #
+// ############
+// FIXME
+void EditorWindow::File_Manager(wxCommandEvent &event) {
+    switch (event.GetId()) {
+        case FILE_SAVE: {
+            if (titleBox->GetValue() == "") {
+                wxTextEntryDialog getNameDialog(this,
+                                                 "Enter a name for the File:",
+                                                 "File name Request");
+                if (getNameDialog.ShowModal() != wxID_OK) {
+                    wxMessageBox("Could not Save File!\n"
+                                 "File must have a name!", "Error");
+                    return;
+                }
+                titleBox->SetValue(getNameDialog.GetValue());
+            }
+            if (currentDocUUID == "") {
+                currentDocUUID = DataMan::CreateUUIDString();
+            }
+            DataMan::DocData data = DataMan::CreateDocData(currentDocUUID,
+                                                           titleBox->GetValue().ToStdString(),
+                                                           richTextBox->GetValue().ToStdString(),
+                                                           DataMan::DocData::NONE);
+            DataMan::Entry_Save(data);
+            std::cout << "FILE_SAVE" << std::endl;
+            break;
+        }
+        case FILE_LOAD: {
+            std::cout << "FILE_LOAD" << std::endl;
+            break;
+        }
+        case FILE_NEW: {
+            std::cout << "FILE_NEW" << std::endl;
+            break;
+        }
+        case FILE_DELETE_FILE: {
+            std::cout << "FILE_DELETE_FILE" << std::endl;
+            break;
+        }
+        default:
+            std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
+            break;
+    }
+    DataMan::Table_Print();
+}
+
 // #################
 // #      EDIT     #
 // #################
