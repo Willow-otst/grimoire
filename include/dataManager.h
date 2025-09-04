@@ -55,6 +55,7 @@ public:
     );
     static std::vector<DataMan::DocData> ProcessQuery(const std::string& query);
     static void Entry_Save(DocData data);
+    static void Entry_Delete(std::string docUUID);
     static void Table_Instanciate();
     static void Table_Print();
     /*

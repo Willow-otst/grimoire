@@ -195,6 +195,14 @@ void DataMan::Entry_Save(DocData data) {
     )";
     DataMan::ProcessQuery(insert);
 }
+void DataMan::Entry_Delete(std::string docUUID) {
+    const std::string deleteQuery = R"(
+        DELETE FROM DocData
+        WHERE DocUUID = ')" + docUUID + R"(';
+        )";
+    DataMan::ProcessQuery(deleteQuery);
+}
+
 
 void DataMan::Table_Instanciate() {
     const std::string createTable = R"(
