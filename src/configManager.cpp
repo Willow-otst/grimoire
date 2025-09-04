@@ -94,7 +94,7 @@ void ConfigMan::LoadConfig(std::string cfgPath) {
 
     CheckTable("SHORTCUTS");
     SHORTCUT_SAVE =                     CheckValue("SHORTCUTS", "SAVE",                     "CTRL+S");
-    SHORTCUT_LOAD =                     CheckValue("SHORTCUTS", "LOAD",                     "");
+    SHORTCUT_LOAD =                     CheckValue("SHORTCUTS", "LOAD",                     "CTRL+L");
     SHORTCUT_NEW =                      CheckValue("SHORTCUTS", "NEW",                      "CTRL+N");
     SHORTCUT_RENAME =                   CheckValue("SHORTCUTS", "RENAME",                   "");
     SHORTCUT_HISTORY =                  CheckValue("SHORTCUTS", "HISTORY",                  "CTRL+SHIFT+H");
