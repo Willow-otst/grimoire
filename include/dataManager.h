@@ -3,12 +3,13 @@
 #include "sqlite3.h"
 #include <vector>
 
+#include <iostream>
+
 class DataMan {
 private:
     DataMan() = delete;
     ~DataMan() = delete;
 
-    static sqlite3* selectedDB;
     static std::string Path_File_SelectedDB;
 
     static const std::string PATH_BASE;
@@ -16,9 +17,18 @@ private:
     static const std::string PATH_DIR_DB;
     static const std::string PATH_FILE_CONFIG;
 
+public:
+    // std::cout << "=============| DocData |============\n"
+    // << "DocUUID: " << data.DocUUID << "\n"
+    // << "Title: " << data.Title << "\n"
+    // << "PlainText: " << data.PlainText << "\n"
+    // << "EncodeType: " << data.EncodeType << "\n"
+    // << "EncodeKey: " << data.EncodeKey << "\n"
+    // << "MetaData: " << data.MetaData << "\n"
+    // << "====================================" << std::endl;
     struct DocData {
         enum enum_EncodeType {
-            NONE
+            NONE = 0
         };
 
         std::string DocUUID;
@@ -33,8 +43,20 @@ private:
         DocData Data;
     };
 
+    // UUID
     static std::string CreateUUIDString();
-public:
+
+    // ENTRY PROCESSING
+    static DocData CreateDocData(
+        std::string DocUUID,
+        std::string Title,
+        std::string textData,
+        DocData::enum_EncodeType EncodeType
+    );
+    static std::vector<DataMan::DocData> ProcessQuery(const std::string& query);
+    static void Entry_Save(DocData data);
+    static void Table_Instanciate();
+    static void Table_Print();
     /*
      * CREATE FILE
      * SAVE FILE

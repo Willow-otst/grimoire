@@ -8,8 +8,7 @@
 #include <string>
 #include <filesystem>
 #include <vector>
-
-sqlite3* DataMan::selectedDB;
+#include <map>
 
 // #############
 // #   Paths   #
@@ -96,6 +95,129 @@ std::string DataMan::CreateUUIDString() {
     return uuids::to_string(gen());
 }
 
+// ########################
+// #   ENTRY PROCESSING   #
+// ########################
+DataMan::DocData DataMan::CreateDocData(
+    std::string DocUUID, std::string Title,
+    std::string textData, DataMan::DocData::enum_EncodeType EncodeType
+) {
+    DocData data{
+        .DocUUID = DocUUID,
+        .Title = Title,
+        .PlainText = "",
+        .EncodeType = EncodeType,
+        .EncodeKey = "",
+        .MetaData = "",
+    };
+
+    switch (EncodeType) {
+        case DataMan::DocData::NONE: {
+            data.PlainText = textData;
+            break; }
+        // TODO Other Encode Types
+        default:
+            std::cout << "ERROR - Incorrect ID passed: " << EncodeType << std::endl;
+            break;
+    }
+    return data;
+}
+
+int GetReturnVal(void* data, int argc, char** argv, char** colNames) {
+    std::vector<DataMan::DocData>* docList = static_cast<std::vector<DataMan::DocData>*>(data);
+
+    DataMan::DocData doc;
+    for (int i = 0; i < argc; ++i) {
+        std::string colName = colNames[i];
+        std::string value = argv[i] ? argv[i] : "";
+
+
+        if (colName == "DocUUID") {
+            doc.DocUUID = value;
+        } else if (colName == "Title") {
+            doc.Title = value;
+        } else if (colName == "PlainText") {
+            doc.PlainText = value;
+        } else if (colName == "EncodeType") {
+            doc.EncodeType = static_cast<DataMan::DocData::enum_EncodeType>(std::stoi(value));
+        } else if (colName == "EncodeKey") {
+            doc.EncodeKey = value;
+        } else if (colName == "MetaData") {
+            doc.MetaData = value;
+        }
+    }
+
+    docList->push_back(doc);
+    return 0;
+}
+std::vector<DataMan::DocData> DataMan::ProcessQuery(const std::string& query) {
+    std::vector<DataMan::DocData> returnVal;
+
+    sqlite3* selectedDB = nullptr;
+    std::string dbPath = DataMan::DB_GetSelectedDB();
+    const char* cpath = dbPath.c_str();
+    int dbCode = sqlite3_open(cpath, &selectedDB);
+
+    if (dbCode != SQLITE_OK) {
+        std::cerr << "Failed to open database: " << sqlite3_errmsg(selectedDB) << std::endl;
+        return returnVal;
+    }
+
+    char* errMsg = nullptr;
+    dbCode = sqlite3_exec(selectedDB, query.c_str(), GetReturnVal, &returnVal, &errMsg);
+
+    if (!returnVal.empty()) {
+        for (std::size_t i = 0; i < returnVal.size(); ++i) {
+            const DataMan::DocData& doc = returnVal[i];
+        }
+    }
+
+    if (dbCode != SQLITE_OK || errMsg) {
+        sqlite3_free(errMsg);
+    }
+
+    sqlite3_close(selectedDB);
+    return returnVal;
+}
+
+void DataMan::Entry_Save(DocData data) {
+    const std::string insert = R"(
+        INSERT OR REPLACE INTO DocData (
+            DocUUID, Title, PlainText, EncodeType, EncodeKey, MetaData
+        ) VALUES (
+            ')" + data.DocUUID + R"(',
+            ')" + data.Title + R"(',
+            ')" + data.PlainText + R"(',
+            )" + std::to_string(data.EncodeType) + R"(,
+            ')" + data.EncodeKey + R"(',
+            ')" + data.MetaData + R"('
+        );
+    )";
+    DataMan::ProcessQuery(insert);
+}
+
+void DataMan::Table_Instanciate() {
+    const std::string createTable = R"(
+        CREATE TABLE IF NOT EXISTS DocData (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            DocUUID TEXT UNIQUE NOT NULL,
+            Title TEXT,
+            PlainText TEXT,
+            EncodeType INTEGER,
+            EncodeKey TEXT,
+            MetaData TEXT
+        );
+    )";
+    DataMan::ProcessQuery(createTable);
+}
+
+void DataMan::Table_Print() {
+     std::vector<DataMan::DocData> Table = DataMan::ProcessQuery("SELECT * FROM DocData;");
+     for (DataMan::DocData doc : Table) {
+        std::cout << doc.Title << " | " << doc.PlainText << std::endl;
+    }
+}
+
 // ##########
 // #   DB   #
 // ##########
@@ -104,8 +226,10 @@ std::string DataMan::DB_GetSelectedDB() {
 }
 void DataMan::DB_Load(std::string path) {
     Path_File_SelectedDB = path;
+    DataMan::Table_Instanciate();
 }
 bool DataMan::DB_Create(std::string path) {
+    sqlite3* selectedDB = nullptr;
     const char* cpath = path.c_str();
     int dbCode = sqlite3_open(cpath, &selectedDB);
     sqlite3_close(selectedDB);
