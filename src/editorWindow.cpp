@@ -291,23 +291,45 @@ void EditorWindow::File_Manager(wxCommandEvent &event) {
                                                            DataMan::DocData::NONE);
             DataMan::Entry_Save(data);
             std::cout << "FILE_SAVE" << std::endl;
-            break;
-        }
+            break; }
         case FILE_LOAD: {
             std::cout << "FILE_LOAD" << std::endl;
-            break;
-        }
+            break; }
         case FILE_NEW: {
+            wxMessageDialog promptSave(
+                this,
+                "Do you want to save the Current Document?",
+                "Save",
+                wxYES_NO | wxYES_DEFAULT | wxICON_QUESTION
+            );
+            if (promptSave.ShowModal() != wxID_YES) {
+                // FIXME Save Doc
+                std::cout << "SAVE on NEW" << std::endl;
+            }
+
+            currentDocUUID = DataMan::CreateUUIDString();
+            titleBox->SetValue("untitled entry");
+            richTextBox->SetValue("");
+
             std::cout << "FILE_NEW" << std::endl;
-            break;
-        }
+            break; }
         case FILE_DELETE_FILE: {
+            wxMessageDialog confirmDelete(
+                this,
+                "Are you Sure You want to delete the current Document?",
+                "Confirm Deletion",
+                wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION
+            );
+            if (confirmDelete.ShowModal() == wxID_YES) {
+                DataMan::Entry_Delete(currentDocUUID);
+                // FIXME NEW File
+                // TODO Delete History
+            }
             std::cout << "FILE_DELETE_FILE" << std::endl;
-            break;
-        }
-        default:
+            break; }
+        default: {
             std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
-            break;
+            break; }
     }
     DataMan::Table_Print();
 }
