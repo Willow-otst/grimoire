@@ -259,7 +259,45 @@ void DataMan::Table_Instanciate() {
             MetaData TEXT
         );
     )";
+
+    const std::string createFTS = R"(
+        CREATE VIRTUAL TABLE IF NOT EXISTS DocData_fts
+        USING fts5(Title, PlainText, content='DocData', content_rowid='id');
+    )";
+
+    const std::string insertTrigger = R"(
+        CREATE TRIGGER IF NOT EXISTS DocData_ai
+        AFTER INSERT ON DocData
+        BEGIN
+            INSERT INTO DocData_fts(rowid, Title, PlainText)
+            VALUES (new.id, new.Title, new.PlainText);
+        END;
+    )";
+
+    const std::string updateTrigger = R"(
+        CREATE TRIGGER IF NOT EXISTS DocData_au
+        AFTER UPDATE ON DocData
+        BEGIN
+            UPDATE DocData_fts
+            SET Title = new.Title,
+                PlainText = new.PlainText
+            WHERE rowid = new.id;
+        END;
+    )";
+
+    const std::string deleteTrigger = R"(
+        CREATE TRIGGER IF NOT EXISTS DocData_ad
+        AFTER DELETE ON DocData
+        BEGIN
+            DELETE FROM DocData_fts WHERE rowid = old.id;
+        END;
+    )";
+
     DataMan::ProcessQuery(createTable);
+    DataMan::ProcessQuery(createFTS);
+    DataMan::ProcessQuery(insertTrigger);
+    DataMan::ProcessQuery(updateTrigger);
+    DataMan::ProcessQuery(deleteTrigger);
 }
 
 void DataMan::Table_Print() {
