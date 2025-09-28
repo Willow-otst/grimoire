@@ -99,21 +99,29 @@ std::string DataMan::CreateUUIDString() {
 // #   ENTRY PROCESSING   #
 // ########################
 DataMan::DocData DataMan::CreateDocData(
-    std::string DocUUID, std::string Title,
-    std::string textData, DataMan::DocData::enum_EncodeType EncodeType
+    std::string DocUUID,
+    std::string Title,
+    std::string plainText,
+    DataMan::DocData::enum_EncodeType EncodeType,
+    std::string encodeText,
+    std::string metaData
 ) {
     DocData data{
         .DocUUID = DocUUID,
         .Title = Title,
-        .PlainText = "",
+        .PlainText = plainText,
         .EncodeType = EncodeType,
         .EncodeKey = "",
-        .MetaData = "",
+        .MetaData = metaData,
     };
 
     switch (EncodeType) {
         case DataMan::DocData::NONE: {
-            data.PlainText = textData;
+            // Do Nothing
+            break; }
+        case DataMan::DocData::DEFAULT: {
+            // Set Key as Base XML
+            data.EncodeKey = encodeText;
             break; }
         // TODO Other Encode Types
         default:
@@ -180,6 +188,41 @@ std::vector<DataMan::DocData> DataMan::ProcessQuery(const std::string& query) {
     return returnVal;
 }
 
+int GetCountVal(void* data, int argc, char** argv, char** colNames) {
+    if (argc > 0 && argv[0]) {
+        int* out = static_cast<int*>(data);
+        *out = std::stoi(argv[0]);
+    }
+    return 0;
+}
+int DataMan::Get_EntryCount() {
+    const std::string query = "SELECT COUNT(*) FROM DocData;";
+    int returnVal = 0;
+
+    sqlite3* selectedDB = nullptr;
+    std::string dbPath = DataMan::DB_GetSelectedDB();
+    int dbCode = sqlite3_open(dbPath.c_str(), &selectedDB);
+
+    if (dbCode != SQLITE_OK) {
+        std::cerr << "Failed to open database: " << sqlite3_errmsg(selectedDB) << std::endl;
+        sqlite3_close(selectedDB);
+        return returnVal;
+    }
+
+    char* errMsg = nullptr;
+    dbCode = sqlite3_exec(selectedDB, query.c_str(), GetCountVal, &returnVal, &errMsg);
+
+    if (dbCode != SQLITE_OK || errMsg) {
+        std::cerr << "Failed to execute query: " << (errMsg ? errMsg : "Unknown error") << std::endl;
+        sqlite3_free(errMsg);
+        sqlite3_close(selectedDB);
+        return 0;
+    }
+
+    sqlite3_close(selectedDB);
+    return returnVal;
+}
+
 void DataMan::Entry_Save(DocData data) {
     const std::string insert = R"(
         INSERT OR REPLACE INTO DocData (
@@ -225,6 +268,7 @@ void DataMan::Table_Print() {
         std::cout << doc.Title << " | " << doc.PlainText << std::endl;
     }
 }
+
 
 // ##########
 // #   DB   #

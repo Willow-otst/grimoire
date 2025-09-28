@@ -28,7 +28,8 @@ public:
     // << "====================================" << std::endl;
     struct DocData {
         enum enum_EncodeType {
-            NONE = 0
+            NONE = 0,
+            DEFAULT = 1,
         };
 
         std::string DocUUID;
@@ -50,20 +51,17 @@ public:
     static DocData CreateDocData(
         std::string DocUUID,
         std::string Title,
-        std::string textData,
-        DocData::enum_EncodeType EncodeType
+        std::string plainText,
+        DataMan::DocData::enum_EncodeType EncodeType,
+        std::string encodeText,
+        std::string metaData
     );
     static std::vector<DataMan::DocData> ProcessQuery(const std::string& query);
+    static int Get_EntryCount();
     static void Entry_Save(DocData data);
     static void Entry_Delete(std::string docUUID);
     static void Table_Instanciate();
     static void Table_Print();
-    /*
-     * CREATE FILE
-     * SAVE FILE
-     * LOAD FILE
-     * DELETE FILE
-     */
 
     // PATHS
     static void ValidateDefaultPaths();
