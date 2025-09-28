@@ -1,9 +1,12 @@
 #include <wx/richtext/richtextctrl.h>
+#include <wx/richtext/richtextxml.h>
+#include <wx/sstream.h>
 #include <wx/wx.h>
 #include <wx/fdrepdlg.h>
 
 #include "editorWindow.h"
 #include "findReplace_Window.h"
+#include "loadFile_Window.h"
 #include "configManager.h"
 #include "dataManager.h"
 
@@ -285,14 +288,53 @@ void EditorWindow::File_Manager(wxCommandEvent &event) {
             if (currentDocUUID == "") {
                 currentDocUUID = DataMan::CreateUUIDString();
             }
+
+
+
+            wxRichTextXMLHandler* handler = new wxRichTextXMLHandler;
+            handler->SetFlags(handler->GetFlags() | wxRICHTEXT_HANDLER_INCLUDE_STYLESHEET);
+
+            // Register the handler with the buffer
+            richTextBox->GetBuffer().AddHandler(handler);
+
+            // Prepare output stream
+            wxStringOutputStream out;
+
+            // Save the buffer as XML
+            richTextBox->GetBuffer().SaveFile(out, wxRICHTEXT_TYPE_XML);
+
+            // Get the result as wxString
+            wxString richTextString = out.GetString();
+
+
             DataMan::DocData data = DataMan::CreateDocData(currentDocUUID,
                                                            titleBox->GetValue().ToStdString(),
                                                            richTextBox->GetValue().ToStdString(),
-                                                           DataMan::DocData::NONE);
+                                                           DataMan::DocData::DEFAULT,
+                                                           richTextString.ToStdString(),
+                                                           "");
             DataMan::Entry_Save(data);
             std::cout << "FILE_SAVE" << std::endl;
             break; }
         case FILE_LOAD: {
+            // FIXME
+            LoadFile_Window lfWin(this);
+            if (lfWin.ShowModal() == wxID_OK) {
+                DataMan::DocData doc = lfWin.result;
+
+                currentDocUUID = doc.DocUUID;
+                titleBox->SetValue(doc.Title);
+                richTextBox->SetValue(doc.PlainText);
+
+                if (doc.EncodeType == DataMan::DocData::DEFAULT) {
+                    wxStringInputStream in{doc.EncodeKey};
+                    wxRichTextXMLHandler handler;
+                    if(!handler.LoadFile(&richTextBox->GetBuffer(), in)) {
+                        throw std::runtime_error{"Failed to set the contents of wxRichTextCtrl!"};
+                    }
+                }
+
+            }
             std::cout << "FILE_LOAD" << std::endl;
             break; }
         case FILE_NEW: {
@@ -331,7 +373,6 @@ void EditorWindow::File_Manager(wxCommandEvent &event) {
             std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
             break; }
     }
-    DataMan::Table_Print();
 }
 
 // #################
