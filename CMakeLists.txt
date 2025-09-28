@@ -3,29 +3,30 @@ project(Grimoire)
 
 set(CMAKE_CXX_STANDARD 20)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+# === Source Files ===
+file(GLOB_RECURSE APP_SOURCES "src/*.cpp")
 include_directories("include")
 
-#lib - sqlite
+# === SQLite with FTS5 ===
 file(GLOB_RECURSE SQLITE_SOURCES "lib/sqlite/src/*.c")
-list(APPEND SOURCES ${SQLITE_SOURCES})
-include_directories("lib/sqlite/include")
+add_library(sqlite3 STATIC ${SQLITE_SOURCES})
+target_include_directories(sqlite3 PRIVATE "lib/sqlite/include")
+target_compile_definitions(sqlite3 PRIVATE SQLITE_ENABLE_FTS5)
 
-#lib - TOML
+# === TOML ===
 include_directories("lib/TOML")
 
-#lib - stduuid
+# === stduuid ===
 include_directories("lib/stduuid/include")
 
-#exe
+# === Executable ===
 set(EXECUTABLE_OUTPUT_PATH "../bin")
-add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${APP_SOURCES})
+target_link_libraries(${PROJECT_NAME} PRIVATE sqlite3)
 
+# === wxWidgets ===
 find_package(wxWidgets REQUIRED COMPONENTS core base richtext)
-if(wxWidgets_USE_FILE) # not defined in CONFIG mode
+if(wxWidgets_USE_FILE)
     include(${wxWidgets_USE_FILE})
 endif()
-target_link_libraries(${CMAKE_PROJECT_NAME} ${wxWidgets_LIBRARIES})
-
-
-
+target_link_libraries(${PROJECT_NAME} PRIVATE ${wxWidgets_LIBRARIES})
