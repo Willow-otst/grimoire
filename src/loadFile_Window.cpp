@@ -5,8 +5,6 @@
 LoadFile_Window::LoadFile_Window(wxWindow* parent)
 : wxDialog(parent, wxID_ANY, "Select File", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
 currentPage(1), entriesPerPage(10) {
-    SetMinSize(wxSize(400, 300)); // Adjust dimensions as needed
-
     // Main vertical layout
     wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
