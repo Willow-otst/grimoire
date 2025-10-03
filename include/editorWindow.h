@@ -21,6 +21,8 @@ public:
 
     // FILE
     void File_Manager(wxCommandEvent &event);
+    wxTimer autosaveTimer;
+    void AutosaveFile(wxTimerEvent& event);
 
     // EDIT
     void Edit_Undo(wxCommandEvent &event);

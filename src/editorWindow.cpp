@@ -32,7 +32,7 @@ std::string currentDocUUID;
 // #################
 // #  Constructor  #
 // #################
-EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultPosition, wxSize(500, 500)) {
+EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultPosition, wxSize(500, 500)), autosaveTimer(this, wxID_ANY) {
     wxMenuBar *menuBar = new wxMenuBar;
 
     // File
@@ -164,6 +164,9 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
     textAttr.SetFontUnderlined(wxTEXT_ATTR_UNDERLINE_NONE);
     textAttr.SetBackgroundColour(wxTransparentColour);
 
+    // AutoSave
+    Bind(wxEVT_TIMER, &EditorWindow::AutosaveFile, this);
+
     // Title bar
     titleBox = new wxTextCtrl(this, wxID_ANY, "untitled entry", wxDefaultPosition, wxDefaultSize);
     titleBox->SetDefaultStyle(textAttr);
@@ -193,6 +196,9 @@ EditorWindow::~EditorWindow() {
 
 // Custom Key Behaviour
 void EditorWindow::KeyDown(wxKeyEvent& event) {
+    // Save after pause in user presses
+    autosaveTimer.Start(2000, wxTIMER_ONE_SHOT);
+
     // ############################
     // #   Custom TAB Behaviour   #
     // ############################
@@ -317,6 +323,10 @@ static void h_FileNew() {
 static void h_FileDelete() {
     DataMan::Entry_Delete(currentDocUUID);
 }
+void EditorWindow::AutosaveFile(wxTimerEvent &event) {
+    std::cout << "File Saved: AUTO" << std::endl;
+    h_FileSave();
+}
 void EditorWindow::File_Manager(wxCommandEvent &event) {
     switch (event.GetId()) {
         case FILE_SAVE: {
@@ -336,9 +346,6 @@ void EditorWindow::File_Manager(wxCommandEvent &event) {
             break; }
         case FILE_NEW: {
             if (richTextBox->GetValue() != "") {
-                h_FileSave();
-            }
-            if (promptSave.ShowModal() == wxID_YES) {
                 h_FileSave();
             }
             h_FileNew();
