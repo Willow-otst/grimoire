@@ -135,6 +135,7 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
         Bind(wxEVT_MENU, &EditorWindow::Edit_FindReplace, this, SEARCH_FILE);
         menuSearch->Append(SEARCH_FILE_ARCHIVE,     "Search File Archive\t" + ConfigMan::SHORTCUT_SEARCH_FILE_ARCHIVE, "");
         menuSearch->Append(SEARCH_GRIMOIRE,         "Search Grimoire\t" + ConfigMan::SHORTCUT_SEARCH_GRIMOIRE, "");
+        Bind(wxEVT_MENU, &EditorWindow::File_Manager, this, SEARCH_GRIMOIRE);
         menuSearch->Append(SEARCH_GRIMOIRE_ARCHIVE, "Search Grimoire Archive\t" + ConfigMan::SHORTCUT_SEARCH_GRIMOIRE_ARCHIVE, "");
     menuBar->Append(menuSearch, "&Search");
 
@@ -270,90 +271,77 @@ void EditorWindow::KeyDown(wxKeyEvent& event) {
 // ############
 // #   FILE   #
 // ############
-// FIXME
+// File_Manager (h)Helpers
+static void h_FileSave() {
+    if (currentDocUUID == "") {
+        currentDocUUID = DataMan::CreateUUIDString();
+    }
+
+    wxRichTextXMLHandler* handler = new wxRichTextXMLHandler;
+    handler->SetFlags(handler->GetFlags() | wxRICHTEXT_HANDLER_INCLUDE_STYLESHEET);
+    // Register the handler with the buffer
+    richTextBox->GetBuffer().AddHandler(handler);
+    // Prepare output stream
+    wxStringOutputStream out;
+    // Save the buffer as XML
+    richTextBox->GetBuffer().SaveFile(out, wxRICHTEXT_TYPE_XML);
+    // Get the result as wxString
+    wxString richTextString = out.GetString();
+
+    DataMan::DocData data = DataMan::CreateDocData(currentDocUUID,
+                                                   titleBox->GetValue().ToStdString(),
+                                                   richTextBox->GetValue().ToStdString(),
+                                                   DataMan::DocData::DEFAULT,
+                                                   richTextString.ToStdString(),
+                                                   "");
+    DataMan::Entry_Save(data);
+}
+static void h_FileLoad(DataMan::DocData doc) {
+    currentDocUUID = doc.DocUUID;
+    titleBox->SetValue(doc.Title);
+    richTextBox->SetValue(doc.PlainText);
+
+    if (doc.EncodeType == DataMan::DocData::DEFAULT) {
+        wxStringInputStream in{doc.EncodeKey};
+        wxRichTextXMLHandler handler;
+        if(!handler.LoadFile(&richTextBox->GetBuffer(), in)) {
+            throw std::runtime_error{"Failed to set the contents of wxRichTextCtrl!"};
+        }
+    }
+}
+static void h_FileNew() {
+    currentDocUUID = DataMan::CreateUUIDString();
+    titleBox->SetValue("untitled entry");
+    richTextBox->SetValue("");
+}
+static void h_FileDelete() {
+    DataMan::Entry_Delete(currentDocUUID);
+}
 void EditorWindow::File_Manager(wxCommandEvent &event) {
     switch (event.GetId()) {
         case FILE_SAVE: {
-            if (titleBox->GetValue() == "") {
-                wxTextEntryDialog getNameDialog(this,
-                                                 "Enter a name for the File:",
-                                                 "File name Request");
-                if (getNameDialog.ShowModal() != wxID_OK) {
-                    wxMessageBox("Could not Save File!\n"
-                                 "File must have a name!", "Error");
-                    return;
-                }
-                titleBox->SetValue(getNameDialog.GetValue());
-            }
-            if (currentDocUUID == "") {
-                currentDocUUID = DataMan::CreateUUIDString();
-            }
-
-
-
-            wxRichTextXMLHandler* handler = new wxRichTextXMLHandler;
-            handler->SetFlags(handler->GetFlags() | wxRICHTEXT_HANDLER_INCLUDE_STYLESHEET);
-
-            // Register the handler with the buffer
-            richTextBox->GetBuffer().AddHandler(handler);
-
-            // Prepare output stream
-            wxStringOutputStream out;
-
-            // Save the buffer as XML
-            richTextBox->GetBuffer().SaveFile(out, wxRICHTEXT_TYPE_XML);
-
-            // Get the result as wxString
-            wxString richTextString = out.GetString();
-
-
-            DataMan::DocData data = DataMan::CreateDocData(currentDocUUID,
-                                                           titleBox->GetValue().ToStdString(),
-                                                           richTextBox->GetValue().ToStdString(),
-                                                           DataMan::DocData::DEFAULT,
-                                                           richTextString.ToStdString(),
-                                                           "");
-            DataMan::Entry_Save(data);
-            std::cout << "FILE_SAVE" << std::endl;
+            h_FileSave();
             break; }
+        case SEARCH_GRIMOIRE:
         case FILE_LOAD: {
-            // FIXME
+            if (richTextBox->GetValue() != "") {
+                h_FileSave();
+            }
+
             LoadFile_Window lfWin(this);
             if (lfWin.ShowModal() == wxID_OK) {
-                DataMan::DocData doc = lfWin.result;
-
-                currentDocUUID = doc.DocUUID;
-                titleBox->SetValue(doc.Title);
-                richTextBox->SetValue(doc.PlainText);
-
-                if (doc.EncodeType == DataMan::DocData::DEFAULT) {
-                    wxStringInputStream in{doc.EncodeKey};
-                    wxRichTextXMLHandler handler;
-                    if(!handler.LoadFile(&richTextBox->GetBuffer(), in)) {
-                        throw std::runtime_error{"Failed to set the contents of wxRichTextCtrl!"};
-                    }
-                }
-
+                //DataMan::DocData doc = lfWin.result;
+                h_FileLoad(lfWin.result);
             }
-            std::cout << "FILE_LOAD" << std::endl;
             break; }
         case FILE_NEW: {
-            wxMessageDialog promptSave(
-                this,
-                "Do you want to save the Current Document?",
-                "Save",
-                wxYES_NO | wxYES_DEFAULT | wxICON_QUESTION
-            );
-            if (promptSave.ShowModal() != wxID_YES) {
-                // FIXME Save Doc
-                std::cout << "SAVE on NEW" << std::endl;
+            if (richTextBox->GetValue() != "") {
+                h_FileSave();
             }
-
-            currentDocUUID = DataMan::CreateUUIDString();
-            titleBox->SetValue("untitled entry");
-            richTextBox->SetValue("");
-
-            std::cout << "FILE_NEW" << std::endl;
+            if (promptSave.ShowModal() == wxID_YES) {
+                h_FileSave();
+            }
+            h_FileNew();
             break; }
         case FILE_DELETE_FILE: {
             wxMessageDialog confirmDelete(
@@ -363,11 +351,9 @@ void EditorWindow::File_Manager(wxCommandEvent &event) {
                 wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION
             );
             if (confirmDelete.ShowModal() == wxID_YES) {
-                DataMan::Entry_Delete(currentDocUUID);
-                // FIXME NEW File
-                // TODO Delete History
+                h_FileDelete();
+                h_FileNew();
             }
-            std::cout << "FILE_DELETE_FILE" << std::endl;
             break; }
         default: {
             std::cout << "ERROR - Incorrect TextID passed: " << event.GetId() << std::endl;
