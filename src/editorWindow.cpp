@@ -187,6 +187,9 @@ EditorWindow::EditorWindow() : wxFrame(nullptr, wxID_ANY, "Grimoire", wxDefaultP
 
     this->SetSizerAndFit(mainSizer);
     this->SetSize(wxSize(450, 500));
+
+    wxCommandEvent SelectGrimoire(wxEVT_MENU, GRIMOIRE_LOAD);
+    ProcessEvent(SelectGrimoire);
 }
 // #################
 // # Deconstructor #
